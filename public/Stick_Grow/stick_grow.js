@@ -246,6 +246,10 @@ function leaveEndedRoom(){
   sessionStorage.removeItem('ribbit-player');
   room='';playerId='';token='';snapshot=null;composedWord='';selectedPower='';
   closeTargetPicker();
+  try{history.replaceState({},'',location.pathname)}catch{}
+  $('joinRoomPill')?.classList.add('hidden');
+  $('roomField')?.classList.remove('hidden');
+  if($('joinCode'))$('joinCode').value='';
   show('home');
   alert('The host ended that game. Join the new room to keep playing.');
 }
@@ -378,6 +382,7 @@ async function createHostRoom(){
   const r=await action('create');
   room=r.code;token=r.token;playerId='';mode='host';snapshot=null;qrRoom='';
   sessionStorage.setItem('ribbit-host',JSON.stringify({room,token}));
+  try{history.replaceState({},'',location.pathname)}catch{}
   show('host');
   await connect();
 }
@@ -484,11 +489,7 @@ if(q.has('name'))$('name').value=q.get('name');
       show('player');await connect();return;
     }
 
-    if(queryRoom&&savedHost?.room===queryRoom){
-      await restartHostAfterReload(savedHost);return;
-    }
-
-    if(!queryRoom&&savedHost){
+    if(savedHost){
       await restartHostAfterReload(savedHost);return;
     }
 
