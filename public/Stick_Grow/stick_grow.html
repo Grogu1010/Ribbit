@@ -7,6 +7,7 @@
   <title>Stick Grow · Ribbit</title>
   <link rel="stylesheet" href="/Home/style.css">
   <link rel="stylesheet" href="stick_grow.css">
+  <link rel="stylesheet" href="stick_grow_polish.css">
 </head>
 <body class="stick-grow-page">
   <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
@@ -65,15 +66,32 @@
           <strong id="roomCode" class="mini-code">-----</strong>
         </div>
         <div id="hostRoundLabel" class="host-round-label">LOBBY</div>
-        <button id="copyLink" class="ghost-btn" type="button">COPY JOIN LINK</button>
+        <div class="host-actions">
+          <button id="copyLink" class="ghost-btn" type="button">COPY JOIN LINK</button>
+        </div>
       </div>
 
       <div id="hostLobby" class="host-lobby">
         <article class="qr-card">
           <div class="eyebrow">SCAN TO JOIN</div>
+          <div class="join-kicker">Point a phone camera here</div>
           <div id="qrCode" class="qr-box" aria-label="QR code to join the room"></div>
-          <div id="bigRoomCode" class="code">-----</div>
+
+          <div class="room-code-panel">
+            <span class="room-code-label">OR ENTER JOIN CODE</span>
+            <div class="room-code-row">
+              <div id="bigRoomCode" class="code">-----</div>
+              <button id="copyCode" class="copy-code-btn" type="button" aria-label="Copy room code">⧉</button>
+            </div>
+          </div>
+
           <p id="joinUrl" class="join-url"></p>
+
+          <div class="join-steps" aria-label="How to join">
+            <div class="join-step"><b>01</b><span>Scan or enter code</span></div>
+            <div class="join-step"><b>02</b><span>Pick your frog name</span></div>
+            <div class="join-step"><b>03</b><span>Watch this screen</span></div>
+          </div>
         </article>
 
         <article class="lobby-card">
@@ -81,12 +99,14 @@
             <div>
               <div class="eyebrow">WHO'S IN?</div>
               <h2><span id="playerCount">0</span> / 12 frogs ready</h2>
+              <p class="lobby-subtitle">Names appear here as players join from their phones.</p>
             </div>
             <div class="lobby-pulse" aria-hidden="true"><i></i><i></i><i></i></div>
           </div>
           <div id="lobbyPlayers" class="player-chips">
             <div class="empty-lobby">Waiting for the first frog…</div>
           </div>
+          <p class="lobby-tip">You can start with one player, or wait for the whole pond.</p>
           <button id="start" class="primary huge start-btn" type="button" disabled>
             <span>START RACE</span>
             <small>First to 60 growth wins</small>
@@ -185,7 +205,8 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="stick_grow.js"></script>
+  <script src="stick_grow_polish.js"></script>
 </body>
 </html>
