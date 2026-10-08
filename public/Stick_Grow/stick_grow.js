@@ -12,6 +12,7 @@ let composedWord='',selectedPower='';
 function show(id){
   ['home','host','player'].forEach(v=>$(v).classList.toggle('hidden',v!==id));
   document.body.classList.toggle('player-mode',id==='player');
+  if(id!=='player')document.body.classList.remove('player-live');
 }
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -235,6 +236,20 @@ function inferEvents(current,previous){
   }
 }
 
+function stopConnection(){
+  if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+  if(channel){db.removeChannel(channel).catch(()=>{});channel=null;}
+}
+
+function leaveEndedRoom(){
+  stopConnection();
+  sessionStorage.removeItem('ribbit-player');
+  room='';playerId='';token='';snapshot=null;composedWord='';selectedPower='';
+  closeTargetPicker();
+  show('home');
+  alert('The host ended that game. Join the new room to keep playing.');
+}
+
 async function refresh(){
   if(!room)return;
   try{
@@ -243,7 +258,11 @@ async function refresh(){
     render(next,previous);
     inferEvents(next,previous);
     snapshot=next;
-  }catch(e){console.warn('Room refresh failed',e)}
+  }catch(e){
+    const message=(e?.message||'').replace(/^.*?: /,'');
+    console.warn('Room refresh failed',e);
+    if(mode==='player'&&/Room not found/i.test(message))leaveEndedRoom();
+  }
 }
 
 function render(r,previous){
@@ -347,21 +366,45 @@ function applyFreeze(me){
 }
 
 async function connect(){
-  if(channel)await db.removeChannel(channel);
+  stopConnection();
   channel=db.channel('ribbit-'+room)
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'ribbit_updates',filter:'room_code=eq.'+room},()=>refresh())
     .subscribe();
-  if(refreshTimer)clearInterval(refreshTimer);
   refreshTimer=setInterval(refresh,4000);
   await refresh();
 }
 
+async function createHostRoom(){
+  const r=await action('create');
+  room=r.code;token=r.token;playerId='';mode='host';snapshot=null;qrRoom='';
+  sessionStorage.setItem('ribbit-host',JSON.stringify({room,token}));
+  show('host');
+  await connect();
+}
+
+async function restartHostAfterReload(savedHost){
+  stopConnection();
+  sessionStorage.removeItem('ribbit-host');
+
+  room=savedHost.room||'';
+  token=savedHost.token||'';
+  mode='host';
+  try{
+    if(room&&token)await action('end');
+  }catch(e){
+    // Older Supabase deployments do not know the v3 `end` action yet.
+    // A fresh room is still created; applying stick_grow_v3.sql makes the
+    // previous room disappear for everyone immediately.
+    console.warn('Previous host room could not be ended cleanly',e);
+  }
+
+  room='';token='';snapshot=null;qrRoom='';
+  await createHostRoom();
+}
+
 $('launch').onclick=()=>safe(async()=>{
   sound('tick');
-  const r=await action('create');
-  room=r.code;token=r.token;mode='host';snapshot=null;qrRoom='';
-  sessionStorage.setItem('ribbit-host',JSON.stringify({room,token}));
-  show('host');await connect();
+  await createHostRoom();
 });
 
 $('join').onclick=()=>safe(async()=>{
@@ -435,17 +478,25 @@ if(q.has('name'))$('name').value=q.get('name');
     const savedHost=JSON.parse(sessionStorage.getItem('ribbit-host')||'null');
     const savedPlayer=JSON.parse(sessionStorage.getItem('ribbit-player')||'null');
     const queryRoom=q.get('room')?.toUpperCase();
-    let saved=null;
-    if(queryRoom){
-      if(savedPlayer?.room===queryRoom)saved=savedPlayer;
-      else if(savedHost?.room===queryRoom)saved=savedHost;
-    }else saved=savedPlayer||savedHost;
 
-    if(saved){
-      room=saved.room;token=saved.token;playerId=saved.playerId||'';
-      mode=saved.playerId?'player':'host';
-      show(mode);await connect();return;
+    if(queryRoom&&savedPlayer?.room===queryRoom){
+      room=savedPlayer.room;token=savedPlayer.token;playerId=savedPlayer.playerId||'';mode='player';
+      show('player');await connect();return;
     }
+
+    if(queryRoom&&savedHost?.room===queryRoom){
+      await restartHostAfterReload(savedHost);return;
+    }
+
+    if(!queryRoom&&savedHost){
+      await restartHostAfterReload(savedHost);return;
+    }
+
+    if(!queryRoom&&savedPlayer){
+      room=savedPlayer.room;token=savedPlayer.token;playerId=savedPlayer.playerId||'';mode='player';
+      show('player');await connect();return;
+    }
+
     if(q.has('room')&&q.has('name'))$('join').click();
   }catch(e){console.warn(e)}
 })();
