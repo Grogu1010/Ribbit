@@ -2,110 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#101d17">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1510">
   <title>Object² · Ribbit</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="toast" class="toast" aria-live="polite"></div>
   <main class="shell">
     <header class="topbar">
-      <a class="ribbit" href="/Home/index.html">ribbit<span>.</span></a>
-      <div class="titleblock">
-        <h1>Object<sup>2</sup></h1>
-        <p>Twist one thing until it becomes another.</p>
-      </div>
-      <div class="progressBox" aria-label="Game progress">
-        <strong id="levelLabel">01 / 70</strong>
-        <span id="bestLabel">0 solved</span>
-      </div>
+      <a class="ribbit" href="/">ribbit<span>.</span></a>
+      <div class="gameTitle">OBJECT<sup>2</sup></div>
+      <div class="liveDot"><i></i> PARTY MODE</div>
     </header>
 
-    <section class="playgrid">
-      <article class="objectCard sourceCard">
-        <div class="cardtop">
-          <span class="eyebrow">START WITH</span>
-          <strong id="sourceName">Water bottle</strong>
-        </div>
-        <div class="stage" id="stage">
-          <canvas id="canvas" width="720" height="520" aria-label="Transformable object"></canvas>
-          <div class="scanlines" aria-hidden="true"></div>
-          <div class="successFlash" id="successFlash" aria-hidden="true"></div>
-        </div>
-        <div class="meterWrap">
-          <div class="meterText"><span>Similarity</span><strong id="scoreText">0%</strong></div>
-          <div class="meter"><i id="meterFill"></i></div>
-        </div>
+    <section id="home" class="screen homeGrid">
+      <article class="heroCard">
+        <div class="eyebrow">MORPH IT. MATCH IT. VOTE IT.</div>
+        <h1>Turn an object<br>into <em>another.</em></h1>
+        <p>Everyone gets the same ridiculous transformation. Sculpt the emoji with four hands-on tools, submit your masterpiece, then vote through a head-to-head bracket for the closest morph.</p>
+        <div class="chips"><span>3–8 players</span><span>70 object pairs</span><span>Phone sculpting</span><span>Bracket voting</span></div>
+        <button id="hostButton" class="primary huge" type="button"><b>HOST ON THIS SCREEN</b><small>TV or laptop</small></button>
       </article>
 
-      <div class="arrow" aria-hidden="true">→</div>
-
-      <article class="objectCard targetCard">
-        <div class="cardtop">
-          <span class="eyebrow">MAKE IT</span>
-          <strong id="targetName">Dog</strong>
-        </div>
-        <div class="goalstage">
-          <div class="targetAsset" id="targetAsset" role="img" aria-label="Target object"></div>
-        </div>
-        <p class="goalcopy" id="goalCopy">Get to 94% similarity to morph it.</p>
+      <article class="joinCard">
+        <div class="joinIcon">🌀</div>
+        <div class="eyebrow">JOIN ON YOUR PHONE</div>
+        <h2>Enter the room</h2>
+        <p class="muted">Scan the host QR code or type the five-character code.</p>
+        <div id="joinRoomPill" class="roomPill hidden">ROOM <strong id="joinRoomValue"></strong></div>
+        <label id="roomField" class="field"><span>ROOM CODE</span><input id="joinCode" maxlength="5" autocapitalize="characters" autocomplete="off" placeholder="ABCDE"></label>
+        <label class="field"><span>YOUR NAME</span><input id="playerName" maxlength="20" autocomplete="nickname" placeholder="Morph wizard"></label>
+        <button id="joinButton" class="primary" type="button">JOIN GAME →</button>
       </article>
     </section>
 
-    <section class="toolbox">
-      <div class="toolHeader">
-        <div>
-          <span class="eyebrow">YOUR TOOLS</span>
-          <h2>Shape the object</h2>
-        </div>
-        <div class="toolActions">
-          <button class="ghost" id="resetBtn" type="button">Reset</button>
-          <button class="ghost" id="hintBtn" type="button">Hint</button>
-        </div>
+    <section id="host" class="screen hidden">
+      <div class="hostStrip">
+        <div><span>ROOM</span><strong id="hostRoomCode">-----</strong></div>
+        <div id="hostPhase" class="phasePill">LOBBY</div>
+        <button id="copyLink" class="ghost" type="button">COPY JOIN LINK</button>
       </div>
 
-      <div class="tools">
-        <label class="tool">
-          <span><b>↻</b> Rotate <em id="rotateValue">0°</em></span>
-          <input id="rotate" type="range" min="-180" max="180" value="0" step="1">
-        </label>
-        <label class="tool">
-          <span><b>〰</b> Warp <em id="warpValue">0</em></span>
-          <input id="warp" type="range" min="-100" max="100" value="0" step="1">
-        </label>
-        <label class="tool">
-          <span><b>↔</b> Stretch <em id="stretchValue">100%</em></span>
-          <input id="stretch" type="range" min="50" max="150" value="100" step="1">
-        </label>
-        <label class="tool">
-          <span><b>◉</b> Fisheye <em id="fisheyeValue">0</em></span>
-          <input id="fisheye" type="range" min="-100" max="100" value="0" step="1">
-        </label>
+      <div id="hostLobby" class="hostLobby">
+        <article class="qrCard">
+          <div class="eyebrow">SCAN TO JOIN</div>
+          <div id="qrCode" class="qrBox"></div>
+          <div id="joinUrl" class="joinUrl"></div>
+        </article>
+        <article class="lobbyCard">
+          <div class="eyebrow">PLAYERS</div>
+          <div class="lobbyHead"><h2><span id="hostPlayerCount">0</span> / 8 joined</h2><span>Need at least 3</span></div>
+          <div id="hostPlayers" class="playerGrid"></div>
+          <button id="startButton" class="primary huge" type="button" disabled><b>START MORPHING</b><small>Everyone gets the same object</small></button>
+        </article>
       </div>
 
-      <div class="statusrow">
-        <p id="hintText">Move any tool to begin.</p>
-        <div class="nav">
-          <button class="ghost" id="randomBtn" type="button">Shuffle</button>
-          <button class="primary" id="nextBtn" type="button" disabled>Next object →</button>
+      <div id="hostRound" class="hidden">
+        <div class="promptCard">
+          <div class="eyebrow">ROUND <span id="hostRoundNumber">1</span></div>
+          <div class="promptObjects">
+            <div><span id="hostSourceEmoji" class="bigEmoji">🧴</span><b id="hostSourceName">Water bottle</b></div>
+            <strong>→</strong>
+            <div><span id="hostTargetEmoji" class="bigEmoji">🐶</span><b id="hostTargetName">Dog</b></div>
+          </div>
+          <p id="hostPromptText">Morph the first object into the second on your phones.</p>
+        </div>
+
+        <div id="hostMorphPanel" class="phaseCard hidden">
+          <div class="phaseHead"><div><div class="eyebrow">MORPHING</div><h2>Waiting for masterpieces</h2></div><strong id="submitCount">0 / 0</strong></div>
+          <div id="submitGrid" class="submitGrid"></div>
+          <button id="forceVoteButton" class="ghost wide" type="button" disabled>START VOTING WITH SUBMITTED PLAYERS</button>
+        </div>
+
+        <div id="hostVotePanel" class="phaseCard hidden">
+          <div class="phaseHead"><div><div class="eyebrow">BRACKET VOTING</div><h2 id="matchTitle">Round 1 · Match 1</h2></div><strong id="voteProgress">0 / 0 votes</strong></div>
+          <div id="hostMatch" class="matchup"></div>
+          <div id="bracketTrail" class="bracketTrail"></div>
+          <button id="resolveButton" class="ghost wide" type="button">RESOLVE NOW</button>
+        </div>
+
+        <div id="hostFinishedPanel" class="phaseCard winnerCard hidden">
+          <div class="eyebrow">ROUND WINNER</div>
+          <h2 id="winnerName">WINNER!</h2>
+          <img id="winnerImage" alt="Winning morph">
+          <div id="scoreboard" class="scoreboard"></div>
+          <button id="nextRoundButton" class="primary huge" type="button"><b>NEXT RANDOM OBJECT</b><small>Same room, new bracket</small></button>
         </div>
       </div>
     </section>
 
-    <footer>
-      <span>Object² has 70 transformations.</span>
-      <span>Web object art: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noreferrer">Twemoji</a>, CC-BY 4.0.</span>
-    </footer>
+    <section id="player" class="screen playerScreen hidden">
+      <div class="playerTop">
+        <a href="/" class="miniBrand">ribbit.</a>
+        <div><span>ROOM</span><strong id="playerRoomCode">-----</strong></div>
+        <div><span>SCORE</span><strong id="playerScore">0</strong></div>
+      </div>
+
+      <div id="playerLobby" class="phoneCard waitingCard">
+        <div class="pulseEmoji">🌀</div>
+        <div class="eyebrow">YOU'RE IN</div>
+        <h2 id="playerLobbyTitle">Waiting for the host…</h2>
+        <p id="playerLobbyInfo" class="muted">3–8 players can play.</p>
+      </div>
+
+      <div id="editorPanel" class="hidden">
+        <div class="phonePrompt">
+          <div><span id="playerSourceEmoji">🧴</span><small id="playerSourceName">Water bottle</small></div>
+          <b>→</b>
+          <div><span id="playerTargetEmoji">🐶</span><small id="playerTargetName">Dog</small></div>
+        </div>
+
+        <article class="editorCard">
+          <div class="editorHeader">
+            <div><div class="eyebrow">SCULPT THE OBJECT</div><h2>Drag directly on it</h2></div>
+            <div class="historyActions"><button id="undoButton" class="tiny ghost" type="button">UNDO</button><button id="resetButton" class="tiny ghost" type="button">RESET</button></div>
+          </div>
+          <div class="canvasWrap"><canvas id="morphCanvas" width="640" height="640"></canvas><div id="brushRing" class="brushRing"></div></div>
+          <div class="toolRow" role="toolbar" aria-label="Morph tools">
+            <button class="toolButton active" data-tool="warp" type="button"><b>〰</b><span>Warp</span></button>
+            <button class="toolButton" data-tool="rotate" type="button"><b>↻</b><span>Rotate</span></button>
+            <button class="toolButton" data-tool="stretch" type="button"><b>↔</b><span>Stretch</span></button>
+            <button class="toolButton" data-tool="fisheye" type="button"><b>◉</b><span>Fisheye</span></button>
+          </div>
+          <div class="brushRow"><span>Brush</span><button class="brushButton" data-radius="90" type="button">S</button><button class="brushButton active" data-radius="145" type="button">M</button><button class="brushButton" data-radius="220" type="button">L</button><em id="toolHint">Warp: drag a specific part where you want it to go.</em></div>
+          <button id="submitMorphButton" class="primary huge submitMorph" type="button"><b>SUBMIT MORPH</b><small>You can update it until voting starts</small></button>
+          <div id="submittedNote" class="submittedNote hidden">✓ Submitted — keep sculpting if you want to improve it.</div>
+        </article>
+      </div>
+
+      <div id="playerVotePanel" class="phoneCard hidden">
+        <div class="eyebrow">HEAD-TO-HEAD VOTE</div>
+        <h2 id="playerMatchTitle">Which got closer?</h2>
+        <p id="voteInstruction" class="muted">Tap the better transformation.</p>
+        <div id="playerMatch" class="phoneMatch"></div>
+        <div id="playerVoteProgress" class="voteStatus"></div>
+      </div>
+
+      <div id="playerResultPanel" class="phoneCard waitingCard hidden">
+        <div id="resultEmoji" class="pulseEmoji">🏆</div>
+        <div class="eyebrow">ROUND COMPLETE</div>
+        <h2 id="playerResultTitle">A morph has won!</h2>
+        <p id="playerResultInfo" class="muted">Eyes on the big screen.</p>
+      </div>
+    </section>
+
+    <footer><span>Object² · 3–8 players · 70 randomized transformations</span><span>Emoji art: Twemoji, CC-BY 4.0</span></footer>
   </main>
 
-  <dialog id="winDialog">
-    <div class="winEmoji" id="winEmoji">🐶</div>
-    <span class="eyebrow">OBJECT MORPHED</span>
-    <h2 id="winTitle">Water bottle → Dog</h2>
-    <p id="winStats">Solved in 0 moves.</p>
-    <button class="primary" id="continueBtn" type="button">Next object →</button>
-  </dialog>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
