@@ -1,6 +1,13 @@
 // Small presentation helpers for the host lobby.
 // Core multiplayer/game logic stays in stick_grow.js.
 (() => {
+  if (!document.querySelector('link[href$="stick_grow_controller.css"]')) {
+    const controllerCss = document.createElement('link');
+    controllerCss.rel = 'stylesheet';
+    controllerCss.href = 'stick_grow_controller.css';
+    document.head.appendChild(controllerCss);
+  }
+
   const $ = id => document.getElementById(id);
   let lastRoom = '';
   let qrRetryTimer = null;
