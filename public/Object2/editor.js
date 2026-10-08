@@ -6,17 +6,21 @@ const meshCanvas=document.createElement('canvas'),mctx=meshCanvas.getContext('2d
 const MOBILE=matchMedia('(max-width:700px)').matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 const SIZE=MOBILE?420:560,GRID=MOBILE?9:12;
 canvas.width=canvas.height=SIZE;texture.width=texture.height=SIZE;meshCanvas.width=meshCanvas.height=SIZE;
-let mesh=[],gesture=null,currentTool='warp',brushRadius=MOBILE?96:125,ready=false,enabled=false,rotation=0;
+let mesh=[],gesture=null,currentTool='warp',ready=false,enabled=false,rotation=0;
 let raf=0,dirty=true;
 
 $('undoButton')?.remove();
 $('resetButton')?.remove();
+document.querySelector('.historyActions')?.remove();
+$('brushRing')?.remove();
+const brushRow=document.querySelector('.brushRow');
+if(brushRow)brushRow.innerHTML='<em id="toolHint">Warp: grab one exact part and drag it where you want it.</em>';
 
 const hints={
-  warp:'Warp: drag a specific part where you want it to go.',
+  warp:'Warp: grab one exact part and drag it where you want it.',
   rotate:'Rotate: drag left or right anywhere — the whole object turns.',
-  stretch:'Stretch: drag a specific part outward to lengthen or squash it.',
-  fisheye:'Fisheye: drag a specific part to bulge it; reverse to pinch it.'
+  stretch:'Stretch: grab one exact part and pull it longer or squash it.',
+  fisheye:'Fisheye: grab one exact part and drag to bulge or pinch it.'
 };
 const regularMesh=()=>{const a=[];for(let y=0;y<=GRID;y++)for(let x=0;x<=GRID;x++)a.push({x:x*SIZE/GRID,y:y*SIZE/GRID});return a};
 const cloneMesh=(source=mesh)=>source.map(p=>({x:p.x,y:p.y}));
@@ -58,16 +62,24 @@ async function setEmoji(emoji){
   }
   mesh=regularMesh();requestRender();ready=true;
 }
-function screenPoint(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*SIZE/r.width,y:(e.clientY-r.top)*SIZE/r.height,rect:r,cssX:e.clientX-r.left,cssY:e.clientY-r.top}}
+function screenPoint(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*SIZE/r.width,y:(e.clientY-r.top)*SIZE/r.height}}
 function modelPoint(e){
   const p=screenPoint(e),cx=SIZE/2,cy=SIZE/2,dx=p.x-cx,dy=p.y-cy,co=Math.cos(-rotation),si=Math.sin(-rotation);
-  return {...p,x:cx+dx*co-dy*si,y:cy+dx*si+dy*co};
+  return {x:cx+dx*co-dy*si,y:cy+dx*si+dy*co};
 }
-function showBrush(e){
-  const ring=$('brushRing');if(!ring)return;
-  if(currentTool==='rotate'){ring.style.display='none';return}
-  const p=screenPoint(e),scale=p.rect.width/SIZE;
-  ring.style.display='block';ring.style.left=p.cssX+'px';ring.style.top=p.cssY+'px';ring.style.width=ring.style.height=(brushRadius*2*scale)+'px';
+function preciseTargets(p){
+  let best=Infinity,anchor=0;
+  for(let i=0;i<mesh.length;i++){
+    const dx=mesh[i].x-p.x,dy=mesh[i].y-p.y,d=dx*dx+dy*dy;
+    if(d<best){best=d;anchor=i}
+  }
+  const stride=GRID+1,row=Math.floor(anchor/stride),col=anchor%stride;
+  const targets=[{i:anchor,w:1}];
+  if(col>0)targets.push({i:anchor-1,w:.16});
+  if(col<GRID)targets.push({i:anchor+1,w:.16});
+  if(row>0)targets.push({i:anchor-stride,w:.16});
+  if(row<GRID)targets.push({i:anchor+stride,w:.16});
+  return targets;
 }
 function apply(e){
   if(!gesture)return;
@@ -76,43 +88,49 @@ function apply(e){
     rotation=gesture.baseRotation+dx*Math.PI/SIZE;
     requestRender();return;
   }
-  const p=modelPoint(e);
+  const p=modelPoint(e),dx=p.x-gesture.start.x,dy=p.y-gesture.start.y;
   if(currentTool==='warp'){
-    const dx=p.x-gesture.last.x,dy=p.y-gesture.last.y;if(Math.abs(dx)+Math.abs(dy)<.5)return;
-    for(const pt of mesh){const dist=Math.hypot(pt.x-p.x,pt.y-p.y);if(dist<brushRadius){const w=(1-dist/brushRadius)**2;pt.x+=dx*w*1.25;pt.y+=dy*w*1.25;clampPoint(pt)}}
+    const stepX=p.x-gesture.last.x,stepY=p.y-gesture.last.y;
+    if(Math.abs(stepX)+Math.abs(stepY)<.3)return;
+    for(const t of gesture.targets){
+      const pt=mesh[t.i];pt.x+=stepX*t.w;pt.y+=stepY*t.w;clampPoint(pt);
+    }
     gesture.last=p;requestRender();return;
   }
-  mesh=cloneMesh(gesture.base);const cx=gesture.start.x,cy=gesture.start.y,dx=p.x-cx,dy=p.y-cy;
+  mesh=cloneMesh(gesture.base);
   if(currentTool==='stretch'){
-    const mag=Math.hypot(dx,dy);if(mag>1){const ux=dx/mag,uy=dy/mag;
-      mesh.forEach((pt,i)=>{const base=gesture.base[i],rx=base.x-cx,ry=base.y-cy,dist=Math.hypot(rx,ry);if(dist>=brushRadius)return;const w=(1-dist/brushRadius)**2,along=rx*ux+ry*uy,perp=-rx*uy+ry*ux,scale=1+Math.min(1.55,mag/brushRadius)*1.05*w,na=along*scale;pt.x=cx+ux*na-uy*perp+dx*.12*w;pt.y=cy+uy*na+ux*perp+dy*.12*w;clampPoint(pt)});
+    const mag=Math.hypot(dx,dy);if(mag>1){
+      const ux=dx/mag,uy=dy/mag,amount=Math.min(SIZE*.42,mag)*1.12;
+      for(const t of gesture.targets){
+        const base=gesture.base[t.i],rx=base.x-gesture.start.x,ry=base.y-gesture.start.y;
+        const along=rx*ux+ry*uy,perp=-rx*uy+ry*ux;
+        const stretched=along*(1+Math.min(1.7,mag/(SIZE*.13))*t.w)+amount*t.w;
+        const pt=mesh[t.i];pt.x=gesture.start.x+ux*stretched-uy*perp;pt.y=gesture.start.y+uy*stretched+ux*perp;clampPoint(pt);
+      }
     }
   }else if(currentTool==='fisheye'){
-    const strength=Math.max(-1.05,Math.min(1.05,(dx-dy)/brushRadius));
-    mesh.forEach((pt,i)=>{const base=gesture.base[i],rx=base.x-cx,ry=base.y-cy,dist=Math.hypot(rx,ry);if(dist>=brushRadius)return;const w=(1-dist/brushRadius)**2,scale=Math.max(.25,1+strength*w*.85);pt.x=cx+rx*scale;pt.y=cy+ry*scale;clampPoint(pt)});
+    const amount=Math.max(-.78,Math.min(.95,(dx-dy)/(SIZE*.18)));
+    for(const t of gesture.targets){
+      const base=gesture.base[t.i],rx=base.x-gesture.start.x,ry=base.y-gesture.start.y;
+      const scale=Math.max(.28,1+amount*t.w);
+      const pt=mesh[t.i];pt.x=gesture.start.x+rx*scale;pt.y=gesture.start.y+ry*scale;clampPoint(pt);
+    }
   }
   requestRender();
 }
 canvas.addEventListener('pointerdown',e=>{
   if(!ready||!enabled)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);
-  const mp=modelPoint(e),sp=screenPoint(e);gesture={start:mp,last:mp,base:cloneMesh(),startScreen:sp,baseRotation:rotation};showBrush(e);
+  const mp=modelPoint(e),sp=screenPoint(e);
+  gesture={start:mp,last:mp,base:cloneMesh(),startScreen:sp,baseRotation:rotation,targets:preciseTargets(mp)};
 },{passive:false});
-canvas.addEventListener('pointermove',e=>{showBrush(e);if(gesture){e.preventDefault();apply(e)}},{passive:false});
+canvas.addEventListener('pointermove',e=>{if(gesture){e.preventDefault();apply(e)}},{passive:false});
 canvas.addEventListener('pointerup',e=>{if(gesture){apply(e);gesture=null;requestRender()}});
 canvas.addEventListener('pointercancel',()=>{gesture=null});
-canvas.addEventListener('pointerleave',()=>{if(!gesture&&$('brushRing'))$('brushRing').style.display='none'});
 
 document.querySelectorAll('.toolButton').forEach(btn=>btn.onclick=()=>{
   currentTool=btn.dataset.tool;document.querySelectorAll('.toolButton').forEach(b=>b.classList.toggle('active',b===btn));
-  $('toolHint').textContent=hints[currentTool];
-  document.querySelectorAll('.brushButton').forEach(b=>b.disabled=currentTool==='rotate');
-  if(currentTool==='rotate'&&$('brushRing'))$('brushRing').style.display='none';
+  const hint=$('toolHint');if(hint)hint.textContent=hints[currentTool];
 });
-document.querySelectorAll('.brushButton').forEach(btn=>btn.onclick=()=>{
-  if(currentTool==='rotate')return;brushRadius=+btn.dataset.radius*(SIZE/640);document.querySelectorAll('.brushButton').forEach(b=>b.classList.toggle('active',b===btn));
-});
-// Scale the default brush to the lower-resolution mobile canvas.
-brushRadius=145*(SIZE/640);
 
 window.Object2Editor={
   async setEmoji(emoji){await setEmoji(emoji)},
