@@ -141,65 +141,73 @@
     </section>
 
     <section id="player" class="player-screen hidden">
-      <div class="phone-head">
-        <div>
-          <span class="strip-label">ROOM</span>
-          <strong id="playerRoomCode">-----</strong>
+      <div id="playerWaitingUi" class="player-waiting-ui">
+        <div class="phone-head">
+          <div>
+            <span class="strip-label">ROOM</span>
+            <strong id="playerRoomCode">-----</strong>
+          </div>
+          <div id="playerRank" class="rank-badge">#–</div>
         </div>
-        <div id="playerRank" class="rank-badge">#–</div>
+
+        <article class="phone-status">
+          <div>
+            <div class="eyebrow">STICK GROW</div>
+            <h2 id="playerStatus">Waiting for the host…</h2>
+            <p id="playerInfo" class="muted"></p>
+          </div>
+          <div id="boostBadge" class="boost-badge">×2</div>
+        </article>
+
+        <div id="waitingCard" class="waiting-card">
+          <div class="waiting-frog">🐸</div>
+          <h3>You're in!</h3>
+          <p>When the race starts, your phone becomes the controller.</p>
+          <div class="mini-tutorial">
+            <div><b>1</b><span>Tap letters in any order to build a word.</span></div>
+            <div><b>2</b><span>Hit GROW and watch your stick move on the big screen.</span></div>
+            <div><b>3</b><span>SNAP and FREEZE each work once per race.</span></div>
+          </div>
+        </div>
       </div>
 
-      <article class="phone-status">
-        <div>
-          <div class="eyebrow">STICK GROW</div>
-          <h2 id="playerStatus">Waiting for the host…</h2>
-          <p id="playerInfo" class="muted"></p>
+      <div id="playControls" class="play-controls compact-controller hidden">
+        <div class="player-game-hud">
+          <button id="snapAction" class="hud-power snap" type="button">✂️<span>SNAP</span></button>
+
+          <div class="player-score-cluster">
+            <span id="mobileRank" class="mobile-rank">#–</span>
+            <strong id="mobileScore" class="mobile-score">0</strong>
+            <span id="mobileBoost" class="mobile-boost">×2</span>
+          </div>
+
+          <button id="freezeAction" class="hud-power freeze" type="button">❄️<span>FREEZE</span></button>
         </div>
-        <div id="boostBadge" class="boost-badge">×2</div>
-      </article>
 
-      <div id="playerLetters" class="letters player-letters"></div>
-
-      <div id="playControls" class="play-controls hidden">
         <div id="freezeBanner" class="freeze-banner hidden">❄️ FROZEN — HOLD ON!</div>
 
-        <div class="word-entry">
-          <input id="word" placeholder="TYPE A WORD…" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
-          <button id="submit" class="grow-btn" type="button"><span>GROW!</span><b>➜</b></button>
+        <div class="word-preview-wrap">
+          <div id="wordPreview" class="word-preview" aria-live="polite"><span>Tap letters</span></div>
+          <button id="undoLetter" class="word-edit-btn" type="button" aria-label="Remove last letter">⌫</button>
+          <button id="clearWord" class="word-edit-btn" type="button" aria-label="Clear word">×</button>
         </div>
 
-        <div class="score-hint">
-          <span>5+ letters = bonus</span>
-          <span>7+ = BIG bonus</span>
-          <span>10+ = ×2 forever</span>
-        </div>
+        <div id="letterHive" class="letter-hive" aria-label="Letter buttons"></div>
 
-        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <button id="submit" class="grow-btn hive-grow" type="button"><span>GROW!</span><b>➜</b></button>
+        <input id="word" type="hidden" value="">
 
-        <section class="your-stick-card">
-          <div class="card-title">
-            <span>YOUR STICK</span>
-            <strong id="myScoreText">0 / 60</strong>
-          </div>
-          <div id="myProgress"></div>
-        </section>
+        <div id="feedback" class="feedback compact-feedback" aria-live="polite"></div>
 
-        <section class="power-card">
-          <div class="power-heading">
-            <div>
-              <div class="eyebrow">SABOTAGE</div>
-              <h3>Choose your victim</h3>
+        <div id="targetPicker" class="target-picker hidden" role="dialog" aria-modal="true" aria-labelledby="targetPowerTitle">
+          <div class="target-picker-card">
+            <div class="target-picker-head">
+              <strong id="targetPowerTitle">CHOOSE A FROG</strong>
+              <button id="closeTargets" type="button" aria-label="Close target picker">×</button>
             </div>
-            <p>Each power works once per race.</p>
+            <div id="targets" class="compact-targets"></div>
           </div>
-          <div id="targets" class="targets"></div>
-        </section>
-      </div>
-
-      <div id="waitingCard" class="waiting-card">
-        <div class="waiting-frog">🐸</div>
-        <h3>You're in!</h3>
-        <p>Look at the big screen. The host starts the chaos.</p>
+        </div>
       </div>
     </section>
   </main>
