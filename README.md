@@ -1,6 +1,6 @@
 # Ribbit 🐸
 
-Ribbit is a Netlify-hosted party-game hub. Its first game, **Stick Grow**, supports 1–12 players using phones as controllers.
+Ribbit is a Netlify-hosted game hub. It currently includes **Stick Grow**, a 1–12 player phone-controller party game, and **Object²**, a 70-level visual transformation puzzle.
 
 ## Setup (no local Node.js required)
 
@@ -8,9 +8,18 @@ Ribbit is a Netlify-hosted party-game hub. Its first game, **Stick Grow**, suppo
 2. Open the **Supabase SQL Editor**, create a new query, copy all of `supabase/setup.sql`, and run it once.
 3. If you already installed the original database setup, also run **`supabase/stick_grow_v2.sql`** once. This applies the faster Stick Grow v2 scoring and 60-point finish line.
 4. Netlify should redeploy automatically after GitHub commits. If not, choose **Deploys → Trigger deploy**.
-5. Visit the Netlify URL, choose **Host on this screen**, and create a room. Players can scan the QR code or enter the five-character room code.
+5. Visit the Netlify URL. Stick Grow uses a host screen plus phones; Object² runs directly in the browser.
 
 The public Supabase URL and **publishable** key are configured in `public/Stick_Grow/stick_grow.js`. Those values are intended for client-side use. **Never put a Supabase secret/service-role key or database password in this repository.**
+
+## Object²
+
+- 70 object-to-object transformations.
+- Four tools: **Rotate, Warp, Stretch, and Fisheye**.
+- The first two source levels use the supplied water-bottle and chair photos.
+- Other object art uses Twemoji (CC-BY 4.0) with native emoji fallbacks.
+- Similarity scoring, hints, shuffle, stars, and solved-level progress stored locally in the browser.
+- Game files live in `public/Object2/`.
 
 ## Stick Grow v2
 
