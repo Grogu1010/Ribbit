@@ -1,7 +1,191 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stick Grow · Ribbit</title><link rel="stylesheet" href="/Home/style.css"><link rel="stylesheet" href="stick_grow.css"></head>
-<body><main><header><h1 class="brand">ribbit.</h1><p class="tag">Stick Grow — grow your words, grow your stick!</p><a href="/">← Games</a></header>
-<section id="home" class="grid"><div class="game"><h2>Stick Grow</h2><p>Host the race on the big screen.</p><button id="launch">Launch game (TV)</button></div><div class="panel"><h2>Join room</h2><input id="joinCode" placeholder="Room code" maxlength="5"><input id="name" placeholder="Player name" maxlength="20"><button id="join">Join (phone)</button></div></section>
-<section id="host" class="hidden"><div class="panel"><p>STICK GROW · TV</p><div>Room code</div><div id="roomCode" class="code"></div><p>Join at <strong id="joinUrl"></strong></p><h2 id="hostStatus">Waiting for players</h2><div id="hostLetters" class="letters"></div><div id="lanes"></div><button id="start">Start race</button><button id="again" class="hidden">Play again</button></div></section>
-<section id="player" class="hidden"><div class="panel"><p>STICK GROW · CONTROLLER</p><h2 id="playerStatus">Waiting for host</h2><p id="playerInfo"></p><div id="playerLetters" class="letters"></div><div id="playControls" class="hidden"><input id="word" placeholder="Type a word" maxlength="30" autocomplete="off" spellcheck="false"><button id="submit">Grow!</button><p class="small muted">Repeat letters freely. Your first 10-letter word unlocks permanent 2× growth.</p><h3>Sabotage</h3><p>Snap: −15 · Freeze: 5 seconds (one use each)</p><div id="targets" class="targets"></div></div><p id="feedback" class="notice"></p><div id="myProgress"></div></div></section>
-</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="stick_grow.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102016">
+  <title>Stick Grow · Ribbit</title>
+  <link rel="stylesheet" href="/Home/style.css">
+  <link rel="stylesheet" href="stick_grow.css">
+</head>
+<body class="stick-grow-page">
+  <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
+
+  <main class="sg-shell">
+    <header class="sg-topbar">
+      <a class="sg-brand" href="/"><span>ribbit</span><b>.</b></a>
+      <div class="sg-game-title">STICK GROW</div>
+      <button id="soundToggle" class="icon-btn" type="button" aria-label="Toggle sound">🔊</button>
+    </header>
+
+    <section id="home" class="sg-home">
+      <article class="hero-card">
+        <div class="eyebrow">THE WORD RACE THAT FIGHTS BACK</div>
+        <h1>Grow words.<br><span>Grow trouble.</span></h1>
+        <p class="hero-copy">Make words from seven letters. Longer words launch your stick farther. Snap rivals, freeze them, and hit the finish first.</p>
+        <div class="rule-chips">
+          <span>⚡ Fast rounds</span>
+          <span>✂️ Snap rivals</span>
+          <span>❄️ Freeze rivals</span>
+          <span>×2 10-letter boost</span>
+        </div>
+        <button id="launch" class="primary huge" type="button">
+          <span>HOST ON THIS SCREEN</span>
+          <small>Perfect for a TV or laptop</small>
+        </button>
+      </article>
+
+      <article class="join-card">
+        <div class="join-icon">🐸</div>
+        <div class="eyebrow">PHONE CONTROLLER</div>
+        <h2>Jump into a room</h2>
+        <p class="muted">Scan the host QR code, or enter the room code.</p>
+
+        <div id="joinRoomPill" class="room-pill hidden">
+          Room <strong id="joinRoomValue"></strong>
+        </div>
+
+        <label id="roomField" class="field">
+          <span>ROOM CODE</span>
+          <input id="joinCode" inputmode="text" autocapitalize="characters" autocomplete="off" placeholder="ABCDE" maxlength="5">
+        </label>
+        <label class="field">
+          <span>YOUR NAME</span>
+          <input id="name" autocomplete="nickname" placeholder="FroggyMcFrog" maxlength="20">
+        </label>
+
+        <button id="join" class="primary" type="button">JOIN RACE →</button>
+      </article>
+    </section>
+
+    <section id="host" class="host-screen hidden">
+      <div class="host-strip">
+        <div>
+          <span class="strip-label">ROOM</span>
+          <strong id="roomCode" class="mini-code">-----</strong>
+        </div>
+        <div id="hostRoundLabel" class="host-round-label">LOBBY</div>
+        <button id="copyLink" class="ghost-btn" type="button">COPY JOIN LINK</button>
+      </div>
+
+      <div id="hostLobby" class="host-lobby">
+        <article class="qr-card">
+          <div class="eyebrow">SCAN TO JOIN</div>
+          <div id="qrCode" class="qr-box" aria-label="QR code to join the room"></div>
+          <div id="bigRoomCode" class="code">-----</div>
+          <p id="joinUrl" class="join-url"></p>
+        </article>
+
+        <article class="lobby-card">
+          <div class="lobby-heading">
+            <div>
+              <div class="eyebrow">WHO'S IN?</div>
+              <h2><span id="playerCount">0</span> / 12 frogs ready</h2>
+            </div>
+            <div class="lobby-pulse" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
+          <div id="lobbyPlayers" class="player-chips">
+            <div class="empty-lobby">Waiting for the first frog…</div>
+          </div>
+          <button id="start" class="primary huge start-btn" type="button" disabled>
+            <span>START RACE</span>
+            <small>First to 60 growth wins</small>
+          </button>
+        </article>
+      </div>
+
+      <div id="hostRace" class="host-race hidden">
+        <div class="race-head">
+          <div>
+            <div class="eyebrow">LIVE RACE</div>
+            <h2 id="hostStatus">GROW!</h2>
+          </div>
+          <div id="hostLetters" class="letters host-letters"></div>
+          <div class="goal-badge"><small>FINISH</small><strong id="goalValue">60</strong></div>
+        </div>
+
+        <div id="eventFeed" class="event-feed" aria-live="polite"></div>
+        <div id="lanes" class="race-lanes"></div>
+
+        <button id="again" class="primary huge hidden" type="button">PLAY AGAIN</button>
+      </div>
+
+      <div id="winnerOverlay" class="winner-overlay hidden" aria-live="assertive">
+        <div class="winner-card">
+          <div class="winner-crown">🏆</div>
+          <div class="eyebrow">STICK SUPREMACY</div>
+          <h2 id="winnerName">WINNER!</h2>
+          <p>Absolutely unnecessary levels of stick.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="player" class="player-screen hidden">
+      <div class="phone-head">
+        <div>
+          <span class="strip-label">ROOM</span>
+          <strong id="playerRoomCode">-----</strong>
+        </div>
+        <div id="playerRank" class="rank-badge">#–</div>
+      </div>
+
+      <article class="phone-status">
+        <div>
+          <div class="eyebrow">STICK GROW</div>
+          <h2 id="playerStatus">Waiting for the host…</h2>
+          <p id="playerInfo" class="muted"></p>
+        </div>
+        <div id="boostBadge" class="boost-badge">×2</div>
+      </article>
+
+      <div id="playerLetters" class="letters player-letters"></div>
+
+      <div id="playControls" class="play-controls hidden">
+        <div id="freezeBanner" class="freeze-banner hidden">❄️ FROZEN — HOLD ON!</div>
+
+        <div class="word-entry">
+          <input id="word" placeholder="TYPE A WORD…" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <button id="submit" class="grow-btn" type="button"><span>GROW!</span><b>➜</b></button>
+        </div>
+
+        <div class="score-hint">
+          <span>5+ letters = bonus</span>
+          <span>7+ = BIG bonus</span>
+          <span>10+ = ×2 forever</span>
+        </div>
+
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+
+        <section class="your-stick-card">
+          <div class="card-title">
+            <span>YOUR STICK</span>
+            <strong id="myScoreText">0 / 60</strong>
+          </div>
+          <div id="myProgress"></div>
+        </section>
+
+        <section class="power-card">
+          <div class="power-heading">
+            <div>
+              <div class="eyebrow">SABOTAGE</div>
+              <h3>Choose your victim</h3>
+            </div>
+            <p>Each power works once per race.</p>
+          </div>
+          <div id="targets" class="targets"></div>
+        </section>
+      </div>
+
+      <div id="waitingCard" class="waiting-card">
+        <div class="waiting-frog">🐸</div>
+        <h3>You're in!</h3>
+        <p>Look at the big screen. The host starts the chaos.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="stick_grow.js"></script>
+</body>
+</html>
