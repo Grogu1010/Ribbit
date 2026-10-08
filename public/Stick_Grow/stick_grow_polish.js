@@ -30,7 +30,7 @@
 
   function ensureQR(code) {
     const box = $('qrCode');
-    if (!box || !code) return;
+    if (!box || !code || qrLooksRendered(box)) return;
 
     clearTimeout(qrRetryTimer);
     qrRetryTimer = setTimeout(() => {
@@ -53,34 +53,34 @@
 
       setTimeout(() => {
         if (!qrLooksRendered(box)) renderFallback(box, code);
-      }, 400);
-    }, 350);
+      }, 450);
+    }, 450);
   }
 
-  function syncLobby() {
+  function syncRoom() {
     const code = roomCode();
+    if (!code) return;
+
     const big = $('bigRoomCode');
+    const url = $('joinUrl');
+    const targetUrl = joinLink(code);
+
+    if (big && big.textContent.trim() !== code) big.textContent = code;
+    if (url && url.textContent !== targetUrl) url.textContent = targetUrl;
+
+    if (code !== lastRoom) lastRoom = code;
+    ensureQR(code);
+  }
+
+  function syncStartButton() {
     const start = $('start');
     const count = Number($('playerCount')?.textContent || 0);
+    if (!start || count !== 0) return;
 
-    if (code) {
-      if (big && big.textContent.trim() !== code) big.textContent = code;
-      if ($('joinUrl')) $('joinUrl').textContent = joinLink(code);
-
-      if (code !== lastRoom) {
-        lastRoom = code;
-        ensureQR(code);
-      } else {
-        ensureQR(code);
-      }
-    }
-
-    if (start && count === 0) {
-      const title = start.querySelector('span');
-      const note = start.querySelector('small');
-      if (title) title.textContent = 'WAITING FOR PLAYERS';
-      if (note) note.textContent = 'Share the QR or join code to begin';
-    }
+    const title = start.querySelector('span');
+    const note = start.querySelector('small');
+    if (title && title.textContent !== 'WAITING FOR PLAYERS') title.textContent = 'WAITING FOR PLAYERS';
+    if (note && note.textContent !== 'Share the QR or join code to begin') note.textContent = 'Share the QR or join code to begin';
   }
 
   const copyCode = $('copyCode');
@@ -103,8 +103,15 @@
     });
   }
 
-  const observer = new MutationObserver(syncLobby);
-  observer.observe(document.body, { subtree: true, childList: true, characterData: true });
-  window.addEventListener('load', syncLobby);
-  syncLobby();
+  const roomNode = $('roomCode');
+  const countNode = $('playerCount');
+  if (roomNode) new MutationObserver(syncRoom).observe(roomNode, { childList: true, characterData: true, subtree: true });
+  if (countNode) new MutationObserver(syncStartButton).observe(countNode, { childList: true, characterData: true, subtree: true });
+
+  window.addEventListener('load', () => {
+    syncRoom();
+    syncStartButton();
+  });
+  syncRoom();
+  syncStartButton();
 })();
