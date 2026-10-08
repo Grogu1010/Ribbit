@@ -1,0 +1,330 @@
+/* Presentation polish for the Stick Grow host/lobby experience.
+   Kept separate from the core stylesheet so the game rules/layout remain easy to maintain. */
+
+.stick-grow-page{
+  --sg-glass:rgba(12,31,20,.82);
+  --sg-glass-strong:rgba(17,43,28,.94);
+  --sg-border:rgba(207,255,175,.13);
+  --sg-soft-lime:rgba(201,255,87,.12);
+}
+
+.sg-topbar{
+  height:68px;
+  padding-inline:clamp(18px,3vw,48px);
+  background:rgba(5,18,11,.86);
+  border-bottom-color:rgba(255,255,255,.08);
+}
+
+.sg-brand{font-size:1.85rem}
+.sg-game-title{letter-spacing:.24em}
+
+.host-screen{
+  min-height:calc(100vh - 68px);
+  max-width:1540px;
+  margin:0 auto;
+  padding:18px clamp(18px,3vw,48px) 42px;
+}
+
+.host-strip{
+  min-height:58px;
+  margin:0 auto 22px;
+  padding:10px 12px 10px 16px;
+  border:1px solid var(--sg-border);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(22,52,34,.74),rgba(8,24,15,.76));
+  box-shadow:0 18px 55px rgba(0,0,0,.22);
+  backdrop-filter:blur(14px);
+}
+
+.host-strip>div:first-child{
+  gap:10px;
+  min-width:185px;
+}
+
+.host-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  min-width:185px;
+}
+
+.host-actions .ghost-btn{white-space:nowrap}
+
+.mini-code{
+  font-size:1.45rem;
+  letter-spacing:.18em;
+  text-shadow:0 0 22px rgba(201,255,87,.16);
+}
+
+.host-round-label{
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.host-lobby{
+  grid-template-columns:minmax(340px,.78fr) minmax(0,1.22fr);
+  gap:24px;
+  max-width:1300px;
+  margin:0 auto;
+  align-items:stretch;
+}
+
+.qr-card,.lobby-card{
+  border-color:var(--sg-border);
+  background:
+    radial-gradient(circle at 50% -20%,rgba(201,255,87,.10),transparent 45%),
+    linear-gradient(155deg,rgba(24,58,37,.94),rgba(8,27,17,.96));
+  box-shadow:0 28px 80px rgba(0,0,0,.34);
+}
+
+.qr-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:560px;
+  padding:28px 30px 26px;
+}
+
+.join-kicker{
+  margin-top:5px;
+  color:#dceedd;
+  font-size:1rem;
+  font-weight:850;
+}
+
+.qr-box{
+  width:250px;
+  height:250px;
+  margin:20px auto 18px;
+  padding:16px;
+  border-radius:26px;
+  outline:1px solid rgba(255,255,255,.18);
+  outline-offset:5px;
+  box-shadow:0 18px 60px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.06);
+  overflow:hidden;
+}
+
+.qr-box canvas,.qr-box img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain;
+  image-rendering:pixelated;
+}
+
+.qr-fallback{
+  display:grid;
+  place-items:center;
+  width:100%;
+  height:100%;
+  padding:20px;
+  text-align:center;
+  color:#16301f;
+  font-weight:950;
+  line-height:1.35;
+}
+
+.room-code-panel{
+  width:100%;
+  max-width:340px;
+  margin-top:2px;
+  padding:15px 16px 14px;
+  border-radius:20px;
+  border:1px solid rgba(201,255,87,.18);
+  background:rgba(201,255,87,.055);
+}
+
+.room-code-label{
+  display:block;
+  margin-bottom:7px;
+  color:#9dc9a3;
+  font-size:.66rem;
+  font-weight:950;
+  letter-spacing:.18em;
+}
+
+.room-code-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.code{
+  font-size:clamp(2.45rem,4.8vw,4.6rem);
+  line-height:.96;
+  letter-spacing:.16em;
+  white-space:nowrap;
+  text-indent:.16em;
+}
+
+.copy-code-btn{
+  flex:0 0 auto;
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.07);
+  color:#edf8ed;
+  cursor:pointer;
+  font-size:1rem;
+}
+
+.copy-code-btn:hover{background:rgba(255,255,255,.12)}
+
+.join-url{
+  width:100%;
+  max-width:350px;
+  margin:14px 0 0;
+  color:#9fbba3;
+  font-size:.72rem;
+  line-height:1.35;
+}
+
+.join-steps{
+  width:100%;
+  max-width:350px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+  margin-top:auto;
+  padding-top:18px;
+}
+
+.join-step{
+  min-height:66px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+  padding:9px 8px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+  text-align:left;
+}
+
+.join-step b{
+  color:var(--lime);
+  font-size:.64rem;
+  letter-spacing:.08em;
+}
+
+.join-step span{
+  color:#d7e8d9;
+  font-size:.72rem;
+  font-weight:800;
+  line-height:1.2;
+}
+
+.lobby-card{
+  min-height:560px;
+  padding:30px;
+  overflow:hidden;
+  position:relative;
+}
+
+.lobby-card:after{
+  content:"";
+  position:absolute;
+  width:360px;
+  height:360px;
+  right:-180px;
+  top:70px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(201,255,87,.065),transparent 68%);
+  pointer-events:none;
+}
+
+.lobby-heading h2{
+  margin-top:7px;
+  font-size:clamp(1.9rem,3vw,2.6rem);
+  letter-spacing:-.035em;
+}
+
+.lobby-subtitle{
+  margin:9px 0 0;
+  color:#93ad98;
+  font-size:.9rem;
+}
+
+.player-chips{
+  position:relative;
+  z-index:1;
+  padding:30px 0 22px;
+}
+
+.player-chip{
+  padding:11px 15px;
+  background:linear-gradient(180deg,#2b5d3a,#21482e);
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
+}
+
+.empty-lobby{
+  width:100%;
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:26px;
+  border:1px dashed rgba(173,220,180,.18);
+  border-radius:20px;
+  background:rgba(3,18,10,.16);
+  color:#7f9e85;
+  text-align:center;
+  font-style:normal;
+  font-weight:700;
+}
+
+.start-btn{
+  position:relative;
+  z-index:1;
+  min-height:82px!important;
+}
+
+.start-btn:disabled{
+  opacity:1;
+  background:linear-gradient(135deg,#708965,#5d7456);
+  color:#17301e;
+  box-shadow:0 8px 0 #3f573b,0 18px 40px rgba(0,0,0,.25);
+}
+
+.start-btn:disabled small{opacity:.72}
+
+.lobby-tip{
+  position:relative;
+  z-index:1;
+  margin:0 0 13px;
+  color:#8da892;
+  font-size:.78rem;
+  text-align:center;
+}
+
+@media (max-width:900px){
+  .host-strip{flex-wrap:wrap}
+  .host-strip>div:first-child,.host-actions{min-width:0}
+  .host-round-label{order:3;width:100%;text-align:center}
+  .host-lobby{grid-template-columns:1fr}
+  .qr-card,.lobby-card{min-height:auto}
+  .join-steps{margin-top:18px}
+}
+
+@media (max-width:560px){
+  .sg-topbar{height:62px}
+  .sg-game-title{display:none}
+  .host-screen{min-height:calc(100vh - 62px);padding-inline:12px}
+  .host-strip{padding:10px}
+  .host-actions{width:100%}
+  .host-actions .ghost-btn{flex:1}
+  .qr-card,.lobby-card{padding:22px 16px;border-radius:22px}
+  .qr-box{width:min(235px,72vw);height:min(235px,72vw)}
+  .code{font-size:clamp(2.2rem,13vw,3.4rem)}
+  .join-steps{grid-template-columns:1fr}
+  .join-step{min-height:52px;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px}
+}
