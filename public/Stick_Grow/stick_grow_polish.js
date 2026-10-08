@@ -13,6 +13,9 @@
   let qrRetryTimer = null;
   let endWatchChannel = null;
   let endWatchRoom = '';
+  let controlChannel = null;
+  let controlRoom = '';
+  let sawHostPresence = false;
 
   function roomCode() {
     const value = ($('roomCode')?.textContent || '').trim().toUpperCase();
@@ -127,12 +130,20 @@
     }
   }
 
+  function clearControlChannel() {
+    try { if (controlChannel && typeof db !== 'undefined') db.removeChannel(controlChannel); } catch {}
+    controlChannel = null;
+    controlRoom = '';
+    sawHostPresence = false;
+  }
+
   function kickPlayerToMain() {
     try { if (typeof stopConnection === 'function') stopConnection(); } catch {}
     try { sessionStorage.removeItem('ribbit-player'); } catch {}
     try { if (endWatchChannel && typeof db !== 'undefined') db.removeChannel(endWatchChannel); } catch {}
     endWatchChannel = null;
     endWatchRoom = '';
+    clearControlChannel();
     location.replace('/Stick_Grow/stick_grow.html?ended=1');
   }
 
@@ -150,6 +161,39 @@
         .subscribe();
     } catch (error) {
       console.warn('Could not watch room end', error);
+    }
+  }
+
+  function watchHostPresence() {
+    try {
+      if (typeof db === 'undefined' || typeof mode === 'undefined' || typeof room === 'undefined') return;
+      if (!room || !['host','player'].includes(mode) || controlRoom === room) return;
+
+      clearControlChannel();
+      controlRoom = room;
+      const role = mode;
+      const key = `${role}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const watchedRoom = room;
+
+      controlChannel = db.channel(`ribbit-control-${watchedRoom}`, { config:{ presence:{ key } } })
+        .on('presence', { event:'sync' }, () => {
+          if (!controlChannel || controlRoom !== watchedRoom) return;
+          const state = controlChannel.presenceState();
+          const presences = Object.values(state).flat();
+          const hasHost = presences.some(item => item?.role === 'host');
+
+          if (role === 'player') {
+            if (hasHost) sawHostPresence = true;
+            else if (sawHostPresence) kickPlayerToMain();
+          }
+        })
+        .subscribe(async status => {
+          if (status === 'SUBSCRIBED' && role === 'host' && controlChannel && controlRoom === watchedRoom) {
+            try { await controlChannel.track({ role:'host', room:watchedRoom }); } catch {}
+          }
+        });
+    } catch (error) {
+      console.warn('Could not watch host presence', error);
     }
   }
 
@@ -194,14 +238,19 @@
   if (startNode) new MutationObserver(syncStartButton).observe(startNode, { attributes:true, childList:true, characterData:true, subtree:true });
   if (lobbyNode) new MutationObserver(syncStartButton).observe(lobbyNode, { attributes:true, attributeFilter:['class'] });
 
-  setInterval(watchForEndedRoom, 700);
+  setInterval(() => {
+    watchForEndedRoom();
+    watchHostPresence();
+  }, 700);
 
   window.addEventListener('load', () => {
     syncRoom();
     syncStartButton();
     watchForEndedRoom();
+    watchHostPresence();
   });
   syncRoom();
   syncStartButton();
   watchForEndedRoom();
+  watchHostPresence();
 })();
