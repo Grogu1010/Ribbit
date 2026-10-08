@@ -5,18 +5,31 @@ Ribbit is a Netlify-hosted party-game hub. Its first game, **Stick Grow**, suppo
 ## Setup (no local Node.js required)
 
 1. Connect this GitHub repository to **Netlify**. The included `netlify.toml` sets the publish directory to `public` and routes `/` to the homepage. Leave the build command empty.
-2. Open [Supabase SQL Editor](https://supabase.com/dashboard) for your project, create a new query, copy **all of [supabase/setup.sql](supabase/setup.sql)** into it, and click **Run**. This creates tables, secure database actions, a starter word dictionary, and realtime publication.
-3. Netlify should redeploy automatically after the GitHub commits. If not, choose **Deploys → Trigger deploy**.
-4. Visit the Netlify URL, choose **Launch game (TV)**, and create a room. Players can visit the same URL, join with the five-character room code, and race.
+2. Open the **Supabase SQL Editor**, create a new query, copy all of `supabase/setup.sql`, and run it once.
+3. If you already installed the original database setup, also run **`supabase/stick_grow_v2.sql`** once. This applies the faster Stick Grow v2 scoring and 60-point finish line.
+4. Netlify should redeploy automatically after GitHub commits. If not, choose **Deploys → Trigger deploy**.
+5. Visit the Netlify URL, choose **Host on this screen**, and create a room. Players can scan the QR code or enter the five-character room code.
 
-The public Supabase URL and **publishable** key are configured in `public/Stick_Grow/stick_grow.js`. These are safe for client-side use. **Never put a Supabase secret/service-role key or database password in this repository.**
+The public Supabase URL and **publishable** key are configured in `public/Stick_Grow/stick_grow.js`. Those values are intended for client-side use. **Never put a Supabase secret/service-role key or database password in this repository.**
+
+## Stick Grow v2
+
+- Host lobby has a QR join code, direct join link, player list, and TV-friendly layout.
+- The race uses animated growing sticks instead of plain progress bars.
+- Live events call out big words, Snaps, Freezes, and 2× unlocks.
+- Player controllers show rank, personal stick growth, 2× status, freeze effects, and large sabotage controls.
+- First to **60 growth** wins.
+- 2–4 letter words score their length.
+- 5–6 letter words get a +3 bonus.
+- 7–8 letter words get a +7 total bonus.
+- 9+ letter words get a +12 total bonus.
+- A valid 10+ letter word activates permanent **2× growth**, including the triggering word.
+- Snap removes **10 growth** and Freeze blocks word submissions for **5 seconds**; each can be used once per race.
 
 ## How multiplayer works
 
-Netlify serves HTML/CSS/JS. The browser connects to Supabase directly. The database function `ribbit_action` validates all game actions and is the only path for score updates. A room-updates table publishes realtime ticks, and clients fetch sanitized room state through the RPC. The game also polls every four seconds as a fallback.
-
-Each round gives seven letters (two vowels, five consonants) with a known 10-letter word. Players may reuse letters within a word, but each distinct word scores only once per player. First valid 10-letter word enables permanent 2× scoring. First to 180 wins. Each player can use Snap (−15) and Freeze (5 seconds) once per race.
+Netlify serves the HTML/CSS/JS. Browsers connect directly to Supabase. The `ribbit_action` database function validates game actions and is the only path for score changes. A tiny room-updates table publishes realtime ticks, and clients then fetch sanitized room state through the RPC. The frontend also polls every four seconds as a fallback.
 
 ## Current limitations
 
-The SQL includes a **small starter dictionary**, not the full English dictionary. More words must be imported into `public.ribbit_words` before general release. There are currently two letter pools: `BEKOPRS` (BOOKKEEPER) and `ACDORST` (CROSSROADS). Room codes are public and room state is visible to anyone who knows the code; host and player action tokens are stored in sessionStorage. There is no login, anti-spam throttling, cleanup of expired rooms, or automated multiplayer test suite yet. The old `server.js` and `package.json` are retained as legacy Node/Socket.IO files but **are not used by Netlify**.
+The SQL still includes a **small starter dictionary**, not a full production English dictionary. More words should be imported into `public.ribbit_words` before a wider release. There are currently two letter pools: `BEKOPRS` (BOOKKEEPER) and `ACDORST` (CROSSROADS). Room codes are public and room state is visible to anyone who knows the code; host and player action tokens are stored in sessionStorage. There is no login, anti-spam throttling, cleanup of expired rooms, or automated multiplayer test suite yet. The old `server.js` and `package.json` are retained as legacy Node/Socket.IO files but **are not used by Netlify**.
