@@ -1,164 +1,244 @@
-const LEVELS=[{"source":"Water bottle","sourceEmoji":"🧴","target":"Dog","targetEmoji":"🐶","rotate":-18,"warp":28,"stretch":132,"fisheye":44,"photo":"assets/water-bottle.webp"},{"source":"Chair","sourceEmoji":"🪑","target":"Ball","targetEmoji":"⚽","rotate":24,"warp":-34,"stretch":74,"fisheye":68,"photo":"assets/chair.webp"},{"source":"Umbrella","sourceEmoji":"☂️","target":"Mushroom","targetEmoji":"🍄","rotate":14,"warp":7,"stretch":108,"fisheye":19,"photo":null},{"source":"Light bulb","sourceEmoji":"💡","target":"Pear","targetEmoji":"🍐","rotate":61,"warp":38,"stretch":127,"fisheye":-55,"photo":null},{"source":"Key","sourceEmoji":"🔑","target":"Guitar","targetEmoji":"🎸","rotate":-53,"warp":-42,"stretch":85,"fisheye":-18,"photo":null},{"source":"Banana","sourceEmoji":"🍌","target":"Moon","targetEmoji":"🌙","rotate":-6,"warp":-11,"stretch":104,"fisheye":19,"photo":null},{"source":"Donut","sourceEmoji":"🍩","target":"Life buoy","targetEmoji":"🛟","rotate":41,"warp":20,"stretch":123,"fisheye":-55,"photo":null},{"source":"Pencil","sourceEmoji":"✏️","target":"Rocket","targetEmoji":"🚀","rotate":-73,"warp":51,"stretch":81,"fisheye":-18,"photo":null},{"source":"Mug","sourceEmoji":"☕","target":"Bucket","targetEmoji":"🪣","rotate":-26,"warp":-29,"stretch":100,"fisheye":19,"photo":null},{"source":"Camera","sourceEmoji":"📷","target":"Robot","targetEmoji":"🤖","rotate":21,"warp":2,"stretch":119,"fisheye":-55,"photo":null},{"source":"Alarm clock","sourceEmoji":"⏰","target":"Sunflower","targetEmoji":"🌻","rotate":68,"warp":33,"stretch":77,"fisheye":-18,"photo":null},{"source":"Pizza slice","sourceEmoji":"🍕","target":"Sailboat","targetEmoji":"⛵","rotate":-46,"warp":-47,"stretch":96,"fisheye":19,"photo":null},{"source":"Guitar","sourceEmoji":"🎸","target":"Fish","targetEmoji":"🐟","rotate":1,"warp":-16,"stretch":115,"fisheye":-55,"photo":null},{"source":"Sneaker","sourceEmoji":"👟","target":"Telephone","targetEmoji":"☎️","rotate":48,"warp":15,"stretch":73,"fisheye":-18,"photo":null},{"source":"Scissors","sourceEmoji":"✂️","target":"Bird","targetEmoji":"🐦","rotate":-66,"warp":46,"stretch":92,"fisheye":19,"photo":null},{"source":"Spoon","sourceEmoji":"🥄","target":"Leaf","targetEmoji":"🍃","rotate":-19,"warp":-34,"stretch":111,"fisheye":-55,"photo":null},{"source":"Fork","sourceEmoji":"🍴","target":"Cactus","targetEmoji":"🌵","rotate":28,"warp":-3,"stretch":130,"fisheye":-18,"photo":null},{"source":"Backpack","sourceEmoji":"🎒","target":"Owl","targetEmoji":"🦉","rotate":75,"warp":28,"stretch":88,"fisheye":19,"photo":null},{"source":"Book","sourceEmoji":"📕","target":"Sandwich","targetEmoji":"🥪","rotate":-39,"warp":-52,"stretch":107,"fisheye":-55,"photo":null},{"source":"Candle","sourceEmoji":"🕯️","target":"Rocket","targetEmoji":"🚀","rotate":8,"warp":-21,"stretch":126,"fisheye":-18,"photo":null},{"source":"Hammer","sourceEmoji":"🔨","target":"Flamingo","targetEmoji":"🦩","rotate":55,"warp":10,"stretch":84,"fisheye":19,"photo":null},{"source":"Headphones","sourceEmoji":"🎧","target":"Ram","targetEmoji":"🐏","rotate":-59,"warp":41,"stretch":103,"fisheye":-55,"photo":null},{"source":"Bell","sourceEmoji":"🔔","target":"Jellyfish","targetEmoji":"🪼","rotate":-12,"warp":-39,"stretch":122,"fisheye":-18,"photo":null},{"source":"Balloon","sourceEmoji":"🎈","target":"Apple","targetEmoji":"🍎","rotate":35,"warp":-8,"stretch":80,"fisheye":19,"photo":null},{"source":"Apple","sourceEmoji":"🍎","target":"Heart","targetEmoji":"❤️","rotate":-79,"warp":23,"stretch":99,"fisheye":-55,"photo":null},{"source":"Heart","sourceEmoji":"❤️","target":"Strawberry","targetEmoji":"🍓","rotate":-32,"warp":54,"stretch":118,"fisheye":-18,"photo":null},{"source":"Glasses","sourceEmoji":"👓","target":"Butterfly","targetEmoji":"🦋","rotate":15,"warp":-26,"stretch":76,"fisheye":19,"photo":null},{"source":"Binoculars","sourceEmoji":"🔭","target":"Giraffe","targetEmoji":"🦒","rotate":62,"warp":5,"stretch":95,"fisheye":-55,"photo":null},{"source":"Violin","sourceEmoji":"🎻","target":"Swan","targetEmoji":"🦢","rotate":-52,"warp":36,"stretch":114,"fisheye":-18,"photo":null},{"source":"Paintbrush","sourceEmoji":"🖌️","target":"Feather","targetEmoji":"🪶","rotate":-5,"warp":-44,"stretch":72,"fisheye":19,"photo":null},{"source":"Toothbrush","sourceEmoji":"🪥","target":"Snake","targetEmoji":"🐍","rotate":42,"warp":-13,"stretch":91,"fisheye":-55,"photo":null},{"source":"Safety pin","sourceEmoji":"🧷","target":"Paperclip","targetEmoji":"📎","rotate":-72,"warp":18,"stretch":110,"fisheye":-18,"photo":null},{"source":"Paperclip","sourceEmoji":"📎","target":"Snake","targetEmoji":"🐍","rotate":-25,"warp":49,"stretch":129,"fisheye":19,"photo":null},{"source":"Ruler","sourceEmoji":"📏","target":"Crocodile","targetEmoji":"🐊","rotate":22,"warp":-31,"stretch":87,"fisheye":-55,"photo":null},{"source":"Saw","sourceEmoji":"🪚","target":"Shark","targetEmoji":"🦈","rotate":69,"warp":0,"stretch":106,"fisheye":-18,"photo":null},{"source":"Axe","sourceEmoji":"🪓","target":"Whale","targetEmoji":"🐋","rotate":-45,"warp":31,"stretch":125,"fisheye":19,"photo":null},{"source":"Broom","sourceEmoji":"🧹","target":"Palm tree","targetEmoji":"🌴","rotate":2,"warp":-49,"stretch":83,"fisheye":-55,"photo":null},{"source":"Basket","sourceEmoji":"🧺","target":"Turtle","targetEmoji":"🐢","rotate":49,"warp":-18,"stretch":102,"fisheye":-18,"photo":null},{"source":"Package","sourceEmoji":"📦","target":"Dice","targetEmoji":"🎲","rotate":-65,"warp":13,"stretch":121,"fisheye":19,"photo":null},{"source":"Gift","sourceEmoji":"🎁","target":"Cake","targetEmoji":"🎂","rotate":-18,"warp":44,"stretch":79,"fisheye":-55,"photo":null},{"source":"Trophy","sourceEmoji":"🏆","target":"Tulip","targetEmoji":"🌷","rotate":29,"warp":-36,"stretch":98,"fisheye":-18,"photo":null},{"source":"Amphora","sourceEmoji":"🏺","target":"Penguin","targetEmoji":"🐧","rotate":76,"warp":-5,"stretch":117,"fisheye":19,"photo":null},{"source":"Teapot","sourceEmoji":"🫖","target":"Elephant","targetEmoji":"🐘","rotate":-38,"warp":26,"stretch":75,"fisheye":-55,"photo":null},{"source":"Microscope","sourceEmoji":"🔬","target":"Lobster","targetEmoji":"🦞","rotate":9,"warp":-54,"stretch":94,"fisheye":-18,"photo":null},{"source":"Telescope","sourceEmoji":"🔭","target":"Giraffe","targetEmoji":"🦒","rotate":56,"warp":-23,"stretch":113,"fisheye":19,"photo":null},{"source":"Syringe","sourceEmoji":"💉","target":"Mosquito","targetEmoji":"🦟","rotate":-58,"warp":8,"stretch":71,"fisheye":-55,"photo":null},{"source":"Thermometer","sourceEmoji":"🌡️","target":"Chilli","targetEmoji":"🌶️","rotate":-11,"warp":39,"stretch":90,"fisheye":-18,"photo":null},{"source":"Fire extinguisher","sourceEmoji":"🧯","target":"Lobster","targetEmoji":"🦞","rotate":36,"warp":-41,"stretch":109,"fisheye":19,"photo":null},{"source":"Wrench","sourceEmoji":"🔧","target":"Dolphin","targetEmoji":"🐬","rotate":-78,"warp":-10,"stretch":128,"fisheye":-55,"photo":null},{"source":"Screwdriver","sourceEmoji":"🪛","target":"Sword","targetEmoji":"🗡️","rotate":-31,"warp":21,"stretch":86,"fisheye":-18,"photo":null},{"source":"Gear","sourceEmoji":"⚙️","target":"Flower","targetEmoji":"🌼","rotate":16,"warp":52,"stretch":105,"fisheye":19,"photo":null},{"source":"Chain","sourceEmoji":"⛓️","target":"Snake","targetEmoji":"🐍","rotate":63,"warp":-28,"stretch":124,"fisheye":-55,"photo":null},{"source":"Anchor","sourceEmoji":"⚓","target":"Octopus","targetEmoji":"🐙","rotate":-51,"warp":3,"stretch":82,"fisheye":-18,"photo":null},{"source":"Lock","sourceEmoji":"🔒","target":"Snail","targetEmoji":"🐌","rotate":-4,"warp":34,"stretch":101,"fisheye":19,"photo":null},{"source":"Suitcase","sourceEmoji":"🧳","target":"Robot","targetEmoji":"🤖","rotate":43,"warp":-46,"stretch":120,"fisheye":-55,"photo":null},{"source":"Shopping cart","sourceEmoji":"🛒","target":"Deer","targetEmoji":"🦌","rotate":-71,"warp":-15,"stretch":78,"fisheye":-18,"photo":null},{"source":"Shopping bags","sourceEmoji":"🛍️","target":"Rabbit","targetEmoji":"🐇","rotate":-24,"warp":16,"stretch":97,"fisheye":19,"photo":null},{"source":"Trash can","sourceEmoji":"🗑️","target":"Top hat","targetEmoji":"🎩","rotate":23,"warp":47,"stretch":116,"fisheye":-55,"photo":null},{"source":"Bathtub","sourceEmoji":"🛁","target":"Boat","targetEmoji":"🚤","rotate":70,"warp":-33,"stretch":74,"fisheye":-18,"photo":null},{"source":"Toilet","sourceEmoji":"🚽","target":"Swan","targetEmoji":"🦢","rotate":-44,"warp":-2,"stretch":93,"fisheye":19,"photo":null},{"source":"Door","sourceEmoji":"🚪","target":"Chocolate bar","targetEmoji":"🍫","rotate":3,"warp":29,"stretch":112,"fisheye":-55,"photo":null},{"source":"Window","sourceEmoji":"🪟","target":"Waffle","targetEmoji":"🧇","rotate":50,"warp":-51,"stretch":70,"fisheye":-18,"photo":null},{"source":"Mirror","sourceEmoji":"🪞","target":"Lollipop","targetEmoji":"🍭","rotate":-64,"warp":-20,"stretch":89,"fisheye":19,"photo":null},{"source":"Bed","sourceEmoji":"🛏️","target":"Crocodile","targetEmoji":"🐊","rotate":-17,"warp":11,"stretch":108,"fisheye":-55,"photo":null},{"source":"Couch","sourceEmoji":"🛋️","target":"Hippo","targetEmoji":"🦛","rotate":30,"warp":42,"stretch":127,"fisheye":-18,"photo":null},{"source":"Ladder","sourceEmoji":"🪜","target":"Giraffe","targetEmoji":"🦒","rotate":77,"warp":-38,"stretch":85,"fisheye":19,"photo":null},{"source":"Ring","sourceEmoji":"💍","target":"Planet","targetEmoji":"🪐","rotate":-37,"warp":-7,"stretch":104,"fisheye":-55,"photo":null},{"source":"Gem","sourceEmoji":"💎","target":"Kite","targetEmoji":"🪁","rotate":10,"warp":24,"stretch":123,"fisheye":-18,"photo":null},{"source":"Battery","sourceEmoji":"🔋","target":"Bus","targetEmoji":"🚌","rotate":57,"warp":55,"stretch":81,"fisheye":19,"photo":null},{"source":"Computer mouse","sourceEmoji":"🖱️","target":"Beetle","targetEmoji":"🪲","rotate":-57,"warp":-25,"stretch":100,"fisheye":-55,"photo":null}];
+const SUPABASE_URL='https://enekvsumzfgeafimjfai.supabase.co';
+const SUPABASE_KEY='sb_publishable_p53PUyE4VpJ-vnNx731pBw_r5APaosj';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-const $=s=>document.querySelector(s);
-const canvas=$('#canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
-const off=document.createElement('canvas'),offCtx=off.getContext('2d',{willReadFrequently:true});
-off.width=canvas.width;off.height=canvas.height;
+let mode='',room='',channel=null,hostState=null,playerId='',playerName='',latestState=null;
+let joinTimer=null,advanceTimer=null,toastTimer=null,lastEditorRound='';
 
-const controls={
-  rotate:$('#rotate'),warp:$('#warp'),stretch:$('#stretch'),fisheye:$('#fisheye')
-};
-const values={
-  rotate:$('#rotateValue'),warp:$('#warpValue'),stretch:$('#stretchValue'),fisheye:$('#fisheyeValue')
-};
+function showScreen(name){['home','host','player'].forEach(id=>$(id).classList.toggle('hidden',id!==name))}
+function toast(message,bad=false){
+  clearTimeout(toastTimer);const el=$('toast');el.textContent=message;el.className='toast show'+(bad?' bad':'');
+  toastTimer=setTimeout(()=>el.className='toast',2300);
+}
+function randomCode(){return Array.from({length:5},()=>ALPHABET[Math.floor(Math.random()*ALPHABET.length)]).join('')}
+function shuffle(list){const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function playerById(id){return hostState?.players.get(id)}
+function stopChannel(){
+  if(joinTimer){clearInterval(joinTimer);joinTimer=null}
+  if(advanceTimer){clearTimeout(advanceTimer);advanceTimer=null}
+  if(channel){db.removeChannel(channel).catch(()=>{});channel=null}
+}
+async function send(event,payload={}){
+  if(!channel)return;
+  try{await channel.send({type:'broadcast',event,payload})}catch(e){console.warn('Object2 broadcast failed',e)}
+}
 
-let levelIndex=0,sourceAsset=null,renderTicket=0,moves=0,hints=0,solved=false;
-let solvedSet=new Set(JSON.parse(localStorage.getItem('object2-solved')||'[]'));
-
-function twemojiCode(s){
-  return Array.from(s).map(ch=>ch.codePointAt(0).toString(16)).filter(c=>c!=='fe0f').join('-');
-}
-function twemojiUrl(s){
-  return `https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/${twemojiCode(s)}.svg`;
-}
-function setTarget(emoji){
-  const host=$('#targetAsset');host.replaceChildren();
-  const img=new Image();img.alt='';img.src=twemojiUrl(emoji);
-  img.onload=()=>host.replaceChildren(img);
-  img.onerror=()=>{const span=document.createElement('span');span.className='nativeEmoji';span.textContent=emoji;host.replaceChildren(span)};
-  host.append(img);
-}
-function loadImage(src){
-  return new Promise((resolve,reject)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=reject;im.src=src;});
-}
-async function loadSource(level){
-  sourceAsset=null;
-  if(level.photo){
-    try{sourceAsset={type:'image',value:await loadImage(level.photo)};}catch{sourceAsset={type:'emoji',value:level.sourceEmoji};}
-  }else{
-    try{sourceAsset={type:'image',value:await loadImage(twemojiUrl(level.sourceEmoji))};}
-    catch{sourceAsset={type:'emoji',value:level.sourceEmoji};}
+function makePublicState(){
+  const s=hostState,players=[...s.players.values()].map(p=>({id:p.id,name:p.name,score:p.score,submitted:!!p.submitted}));
+  let currentMatch=null;
+  if(s.currentMatch){
+    const left=playerById(s.currentMatch.left),right=playerById(s.currentMatch.right);
+    currentMatch={
+      round:s.currentMatch.round,number:s.currentMatch.number,
+      left:{id:left.id,name:left.name,image:s.submissions.get(left.id)},
+      right:{id:right.id,name:right.name,image:s.submissions.get(right.id)},
+      votes:{...s.currentMatch.votes},votesNeeded:Math.max(1,s.players.size-2)
+    };
   }
-  scheduleRender();
+  const winner=s.winner?playerById(s.winner):null;
+  return {
+    status:s.status,round:s.round,levelIndex:s.levelIndex,players,currentMatch,lastResult:s.lastResult,
+    winner:winner?{id:winner.id,name:winner.name,image:s.submissions.get(winner.id),score:winner.score}:null
+  };
 }
-function drawContained(context,asset,w,h){
-  context.clearRect(0,0,w,h);
-  if(!asset)return;
-  if(asset.type==='emoji'){
-    context.save();context.textAlign='center';context.textBaseline='middle';
-    context.font=`360px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
-    context.fillText(asset.value,w/2,h/2+8);context.restore();return;
-  }
-  const im=asset.value,scale=Math.min((w*.78)/im.width,(h*.78)/im.height);
-  const dw=im.width*scale,dh=im.height*scale;
-  context.drawImage(im,(w-dw)/2,(h-dh)/2,dw,dh);
+function broadcastState(){if(mode==='host'&&hostState){renderHost();send('state',makePublicState())}}
+
+function hostJoin(payload){
+  const id=String(payload?.id||''),name=String(payload?.name||'').trim().slice(0,20);if(!id||!name)return;
+  if(hostState.players.has(id)){send('state',makePublicState());return}
+  if(hostState.status!=='lobby'){send('reject',{to:id,message:'That round has already started.'});return}
+  if(hostState.players.size>=8){send('reject',{to:id,message:'This Object² room is full.'});return}
+  hostState.players.set(id,{id,name,score:0,submitted:false});broadcastState();
 }
-function fisheye(source,strength){
-  if(Math.abs(strength)<.01)return source;
-  const w=source.width,h=source.height;
-  const sctx=source.getContext('2d',{willReadFrequently:true});
-  const src=sctx.getImageData(0,0,w,h),out=sctx.createImageData(w,h);
-  const cx=w/2,cy=h/2,k=strength*.72;
-  for(let y=0;y<h;y++){
-    const ny=(y-cy)/cy;
-    for(let x=0;x<w;x++){
-      const nx=(x-cx)/cx,r2=nx*nx+ny*ny;
-      let sx=x,sy=y;
-      if(r2<1){
-        const factor=Math.max(.28,1+k*(1-r2));
-        sx=Math.round(cx+(x-cx)/factor);sy=Math.round(cy+(y-cy)/factor);
-      }
-      if(sx>=0&&sx<w&&sy>=0&&sy<h){
-        const si=(sy*w+sx)*4,di=(y*w+x)*4;
-        out.data[di]=src.data[si];out.data[di+1]=src.data[si+1];out.data[di+2]=src.data[si+2];out.data[di+3]=src.data[si+3];
-      }
+function hostSubmit(payload){
+  if(hostState.status!=='morph')return;
+  const p=hostState.players.get(payload?.id),image=payload?.image;
+  if(!p||typeof image!=='string'||!image.startsWith('data:image/')||image.length>220000)return;
+  hostState.submissions.set(p.id,image);p.submitted=true;broadcastState();
+  if([...hostState.players.values()].every(x=>x.submitted))startBracket();
+}
+function eligibleVoters(match){return [...hostState.players.keys()].filter(id=>id!==match.left&&id!==match.right)}
+function hostVote(payload){
+  if(hostState.status!=='vote'||!hostState.currentMatch)return;
+  const voter=hostState.players.get(payload?.id),m=hostState.currentMatch,choice=payload?.choice;
+  if(!voter||voter.id===m.left||voter.id===m.right||!([m.left,m.right].includes(choice)))return;
+  m.votes[voter.id]=choice;broadcastState();
+  if(eligibleVoters(m).every(id=>m.votes[id]))resolveMatch();
+}
+function setupHostChannel(){
+  stopChannel();
+  channel=db.channel('object2-'+room)
+    .on('broadcast',{event:'join'},({payload})=>hostJoin(payload))
+    .on('broadcast',{event:'submit'},({payload})=>hostSubmit(payload))
+    .on('broadcast',{event:'vote'},({payload})=>hostVote(payload))
+    .on('broadcast',{event:'state_request'},()=>send('state',makePublicState()))
+    .subscribe(status=>{if(status==='SUBSCRIBED')broadcastState()});
+}
+function createHost(){
+  room=randomCode();mode='host';latestState=null;
+  hostState={status:'lobby',round:0,levelIndex:-1,players:new Map(),submissions:new Map(),bracket:null,currentMatch:null,lastResult:null,winner:null};
+  showScreen('host');setupHostChannel();updateQR();renderHost();
+}
+function startRound(){
+  if(hostState.players.size<3){toast('Object² needs at least 3 players.',true);return}
+  hostState.status='morph';hostState.round++;hostState.levelIndex=Object2Level.random(hostState.levelIndex);
+  hostState.submissions=new Map();hostState.bracket=null;hostState.currentMatch=null;hostState.lastResult=null;hostState.winner=null;
+  for(const p of hostState.players.values())p.submitted=false;
+  broadcastState();
+}
+function startBracket(){
+  if(hostState.status!=='morph')return;
+  const entrants=[...hostState.players.values()].filter(p=>p.submitted).map(p=>p.id);
+  if(entrants.length<3){toast('Need at least 3 submitted morphs.',true);return}
+  hostState.status='vote';hostState.lastResult=null;hostState.winner=null;
+  hostState.bracket={round:1,queue:shuffle(entrants),winners:[],matchIndex:0};hostState.currentMatch=null;setNextMatch();
+}
+function setNextMatch(){
+  if(hostState.status!=='vote')return;const b=hostState.bracket;
+  while(true){
+    const idx=b.matchIndex*2;
+    if(idx>=b.queue.length){
+      if(b.winners.length===1){finishRound(b.winners[0]);return}
+      b.queue=[...b.winners];b.winners=[];b.round++;b.matchIndex=0;continue;
     }
+    const left=b.queue[idx],right=b.queue[idx+1];
+    if(!right){b.winners.push(left);b.matchIndex++;continue}
+    hostState.currentMatch={left,right,votes:{},round:b.round,number:b.matchIndex+1};broadcastState();return;
   }
-  sctx.putImageData(out,0,0);return source;
 }
-function render(){
-  const w=canvas.width,h=canvas.height;
-  const base=document.createElement('canvas');base.width=w;base.height=h;
-  drawContained(base.getContext('2d'),sourceAsset,w,h);
-  offCtx.clearRect(0,0,w,h);offCtx.save();offCtx.translate(w/2,h/2);
-  const rot=+controls.rotate.value*Math.PI/180;
-  const warp=+controls.warp.value/100;
-  const stretch=+controls.stretch.value/100;
-  offCtx.rotate(rot);
-  offCtx.transform(stretch,warp*.34,warp*.22,1/Math.sqrt(stretch),0,0);
-  offCtx.drawImage(base,-w/2,-h/2);offCtx.restore();
-  fisheye(off,+controls.fisheye.value/100);
-  ctx.clearRect(0,0,w,h);ctx.drawImage(off,0,0);
+function resolveMatch(){
+  if(hostState.status!=='vote'||!hostState.currentMatch)return;
+  const m=hostState.currentMatch;let leftVotes=0,rightVotes=0;
+  Object.values(m.votes).forEach(choice=>{if(choice===m.left)leftVotes++;else if(choice===m.right)rightVotes++});
+  const winner=leftVotes===rightVotes?(Math.random()<.5?m.left:m.right):(leftVotes>rightVotes?m.left:m.right);
+  hostState.lastResult={winner,left:m.left,right:m.right,leftVotes,rightVotes,tie:leftVotes===rightVotes};
+  hostState.bracket.winners.push(winner);hostState.bracket.matchIndex++;hostState.currentMatch=null;broadcastState();
+  clearTimeout(advanceTimer);advanceTimer=setTimeout(setNextMatch,1400);
 }
-function scheduleRender(){
-  const mine=++renderTicket;
-  requestAnimationFrame(()=>{if(mine===renderTicket)render()});
+function finishRound(winnerId){
+  hostState.status='finished';hostState.winner=winnerId;hostState.currentMatch=null;
+  const winner=playerById(winnerId);if(winner)winner.score++;broadcastState();
 }
-function similarity(){
-  const l=LEVELS[levelIndex];
-  const dr=Math.abs(+controls.rotate.value-l.rotate)/180;
-  const dw=Math.abs(+controls.warp.value-l.warp)/100;
-  const ds=Math.abs(+controls.stretch.value-l.stretch)/100;
-  const df=Math.abs(+controls.fisheye.value-l.fisheye)/100;
-  const weighted=(dr*.24+dw*.26+ds*.24+df*.26);
-  return Math.max(0,Math.round((1-weighted)*100));
+function updateQR(){
+  $('hostRoomCode').textContent=room;const url=`${location.origin}/Object2/index.html?room=${encodeURIComponent(room)}`;
+  $('joinUrl').textContent=url;$('qrCode').replaceChildren();
+  if(window.QRCode)new QRCode($('qrCode'),{text:url,width:230,height:230,colorDark:'#102016',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  else $('qrCode').textContent='Use room '+room;
 }
-function updateUI(move=true){
-  if(move)moves++;
-  values.rotate.textContent=`${controls.rotate.value}°`;
-  values.warp.textContent=(+controls.warp.value>0?'+':'')+controls.warp.value;
-  values.stretch.textContent=`${controls.stretch.value}%`;
-  values.fisheye.textContent=(+controls.fisheye.value>0?'+':'')+controls.fisheye.value;
-  const score=similarity();$('#scoreText').textContent=`${score}%`;$('#meterFill').style.width=score+'%';
-  scheduleRender();
-  if(!solved&&score>=94)completeLevel(score);
+function phaseName(status){return ({lobby:'LOBBY',morph:'MORPHING',vote:'VOTING',finished:'ROUND OVER'})[status]||status.toUpperCase()}
+function setHostPrompt(){
+  const l=Object2Level.get(hostState.levelIndex);
+  $('hostRoundNumber').textContent=hostState.round;$('hostSourceEmoji').textContent=l.sourceEmoji;$('hostTargetEmoji').textContent=l.targetEmoji;
+  $('hostSourceName').textContent=l.source;$('hostTargetName').textContent=l.target;
 }
-function resetTools(countMove=false){
-  controls.rotate.value=0;controls.warp.value=0;controls.stretch.value=100;controls.fisheye.value=0;
-  moves=0;hints=0;solved=false;$('#nextBtn').disabled=true;$('#hintText').textContent='Move any tool to begin.';
-  updateUI(countMove);
+function renderHost(){
+  if(mode!=='host'||!hostState)return;const s=hostState;
+  $('hostRoomCode').textContent=room;$('hostPhase').textContent=phaseName(s.status);
+  $('hostLobby').classList.toggle('hidden',s.status!=='lobby');$('hostRound').classList.toggle('hidden',s.status==='lobby');
+  if(s.status==='lobby'){
+    $('hostPlayerCount').textContent=s.players.size;
+    $('hostPlayers').innerHTML=s.players.size?[...s.players.values()].map(p=>`<div class="playerChip">${esc(p.name)}</div>`).join(''):'<div class="empty">Waiting for phones to join…</div>';
+    $('startButton').disabled=s.players.size<3;return;
+  }
+  setHostPrompt();$('hostMorphPanel').classList.toggle('hidden',s.status!=='morph');$('hostVotePanel').classList.toggle('hidden',s.status!=='vote');$('hostFinishedPanel').classList.toggle('hidden',s.status!=='finished');
+  if(s.status==='morph'){
+    $('hostPromptText').textContent='Everyone has the same source and target. Drag specific parts with the four tools.';
+    const players=[...s.players.values()],done=players.filter(p=>p.submitted).length;
+    $('submitCount').textContent=`${done} / ${players.length}`;$('submitGrid').innerHTML=players.map(p=>`<div class="submitPlayer${p.submitted?' done':''}"><i></i><b>${esc(p.name)}</b></div>`).join('');
+    $('forceVoteButton').disabled=done<3;
+  }else if(s.status==='vote'){
+    $('hostPromptText').textContent='Vote on the phones. Match winners advance until one morph survives.';
+    const m=s.currentMatch;
+    if(!m){
+      const w=s.lastResult?playerById(s.lastResult.winner):null;$('matchTitle').textContent=s.lastResult?(s.lastResult.tie?`${w?.name||'Winner'} advances on a tie-break`:`${w?.name||'Winner'} advances!`):'Building the bracket…';
+      $('voteProgress').textContent='';$('hostMatch').innerHTML='<div class="empty" style="grid-column:1/-1;min-height:220px">Next matchup incoming…</div>';return;
+    }
+    const left=playerById(m.left),right=playerById(m.right),votes=Object.keys(m.votes).length,need=eligibleVoters(m).length;
+    $('matchTitle').textContent=`Bracket ${m.round} · Match ${m.number}`;$('voteProgress').textContent=`${votes} / ${need} votes`;
+    $('hostMatch').innerHTML=`<article class="matchCard"><img src="${s.submissions.get(left.id)}" alt="${esc(left.name)} morph"><b>${esc(left.name)}</b></article><div class="versus">VS</div><article class="matchCard"><img src="${s.submissions.get(right.id)}" alt="${esc(right.name)} morph"><b>${esc(right.name)}</b></article>`;
+    const b=s.bracket;$('bracketTrail').innerHTML=b.queue.map(id=>`<span>${esc(playerById(id)?.name||'?')}</span>`).join('')+b.winners.map(id=>`<span class="advanced">✓ ${esc(playerById(id)?.name||'?')}</span>`).join('');
+  }else if(s.status==='finished'){
+    const winner=playerById(s.winner);$('hostPromptText').textContent='The bracket has spoken.';$('winnerName').textContent=(winner?.name||'Winner')+' wins!';$('winnerImage').src=s.submissions.get(s.winner)||'';
+    $('scoreboard').innerHTML=[...s.players.values()].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name)).map((p,i)=>`<div class="scoreRow"><span>#${i+1} ${esc(p.name)}</span><strong>${p.score} win${p.score===1?'':'s'}</strong></div>`).join('');
+  }
 }
-async function showLevel(i){
-  levelIndex=(i+LEVELS.length)%LEVELS.length;
-  const l=LEVELS[levelIndex];
-  $('#sourceName').textContent=l.source;$('#targetName').textContent=l.target;
-  $('#levelLabel').textContent=String(levelIndex+1).padStart(2,'0')+' / '+LEVELS.length;
-  $('#bestLabel').textContent=`${solvedSet.size} solved`;
-  $('#goalCopy').textContent='Get to 94% similarity to morph it.';
-  setTarget(l.targetEmoji);resetTools(false);await loadSource(l);
+
+function setupPlayerChannel(){
+  stopChannel();
+  channel=db.channel('object2-'+room)
+    .on('broadcast',{event:'state'},({payload})=>receiveState(payload))
+    .on('broadcast',{event:'reject'},({payload})=>{if(payload?.to===playerId){toast(payload.message||'Could not join.',true);sessionStorage.removeItem('object2-player')}})
+    .subscribe(status=>{
+      if(status==='SUBSCRIBED'){
+        requestJoin();joinTimer=setInterval(()=>{if(!latestState?.players?.some(p=>p.id===playerId))requestJoin();else{clearInterval(joinTimer);joinTimer=null}},1500);
+      }
+    });
 }
-function biggestErrorHint(){
-  const l=LEVELS[levelIndex];
-  const arr=[
-    ['Rotate',+controls.rotate.value,l.rotate,8],
-    ['Warp',+controls.warp.value,l.warp,6],
-    ['Stretch',+controls.stretch.value,l.stretch,6],
-    ['Fisheye',+controls.fisheye.value,l.fisheye,6]
-  ].map(x=>[...x,Math.abs(x[1]-x[2])]).sort((a,b)=>b[4]-a[4]);
-  const [name,current,target,tol]=arr[0];
-  if(Math.abs(current-target)<=tol)return `${name} is very close. Fine-tune another tool.`;
-  const dir=target>current?'higher':'lower';
-  return `${name} needs to go ${dir}.`;
+function requestJoin(){send('join',{id:playerId,name:playerName})}
+function receiveState(state){
+  if(mode!=='player'||!state)return;latestState=state;
+  if(state.players?.some(p=>p.id===playerId)&&joinTimer){clearInterval(joinTimer);joinTimer=null}
+  renderPlayer(state);
 }
-function completeLevel(score){
-  solved=true;solvedSet.add(levelIndex);localStorage.setItem('object2-solved',JSON.stringify([...solvedSet]));
-  $('#bestLabel').textContent=`${solvedSet.size} solved`;$('#nextBtn').disabled=false;
-  $('#successFlash').classList.remove('go');void $('#successFlash').offsetWidth;$('#successFlash').classList.add('go');
-  const l=LEVELS[levelIndex];
-  $('#winEmoji').textContent=l.targetEmoji;$('#winTitle').textContent=`${l.source} → ${l.target}`;
-  const stars=hints===0&&moves<45?'★★★':hints<2?'★★☆':'★☆☆';
-  $('#winStats').textContent=`${stars}  ${score}% similarity · ${moves} moves · ${hints} hints`;
-  setTimeout(()=>$('#winDialog').showModal(),500);
+function joinRoom(){
+  const code=$('joinCode').value.trim().toUpperCase(),name=$('playerName').value.trim();
+  if(!/^[A-Z0-9]{5}$/.test(code)){toast('Enter the five-character room code.',true);return}
+  if(!name){toast('Enter your name.',true);return}
+  room=code;playerName=name.slice(0,20);playerId=crypto.randomUUID();mode='player';latestState=null;
+  sessionStorage.setItem('object2-player',JSON.stringify({room,playerId,playerName}));
+  $('playerRoomCode').textContent=room;showScreen('player');setupPlayerChannel();renderPlayer({status:'lobby',players:[]});
 }
-Object.entries(controls).forEach(([name,el])=>el.addEventListener('input',()=>updateUI(true)));
-$('#resetBtn').addEventListener('click',()=>resetTools(false));
-$('#hintBtn').addEventListener('click',()=>{hints++;$('#hintText').textContent=biggestErrorHint()});
-$('#nextBtn').addEventListener('click',()=>showLevel(levelIndex+1));
-$('#continueBtn').addEventListener('click',()=>{$('#winDialog').close();showLevel(levelIndex+1)});
-$('#randomBtn').addEventListener('click',()=>{let n=levelIndex;while(n===levelIndex)n=Math.floor(Math.random()*LEVELS.length);showLevel(n)});
-$('#winDialog').addEventListener('cancel',e=>{e.preventDefault();$('#winDialog').close()});
-window.addEventListener('keydown',e=>{
-  if(e.key==='r'||e.key==='R')resetTools(false);
-  if(e.key==='h'||e.key==='H'){hints++;$('#hintText').textContent=biggestErrorHint()}
-});
-showLevel(0);
+function setPlayerPanel(which){['playerLobby','editorPanel','playerVotePanel','playerResultPanel'].forEach(id=>$(id).classList.toggle('hidden',id!==which))}
+async function renderPlayer(s){
+  const me=s.players?.find(p=>p.id===playerId);$('playerScore').textContent=me?.score??0;
+  if(s.status==='lobby'){
+    setPlayerPanel('playerLobby');$('playerLobbyTitle').textContent=me?'You’re in!':'Joining room…';
+    $('playerLobbyInfo').textContent=me?`${s.players.length} / 8 players · host starts at 3+`:'Looking for the host screen…';return;
+  }
+  const l=Object2Level.get(s.levelIndex);
+  if(s.status==='morph'){
+    setPlayerPanel('editorPanel');$('playerSourceEmoji').textContent=l.sourceEmoji;$('playerTargetEmoji').textContent=l.targetEmoji;$('playerSourceName').textContent=l.source;$('playerTargetName').textContent=l.target;
+    const key=`${s.round}:${s.levelIndex}`;
+    if(lastEditorRound!==key){lastEditorRound=key;Object2Editor.setEnabled(false);await Object2Editor.setEmoji(l.sourceEmoji)}
+    Object2Editor.setEnabled(true);$('submittedNote').classList.toggle('hidden',!me?.submitted);$('submitMorphButton').querySelector('b').textContent=me?.submitted?'UPDATE SUBMISSION':'SUBMIT MORPH';return;
+  }
+  Object2Editor.setEnabled(false);
+  if(s.status==='vote'){setPlayerPanel('playerVotePanel');renderPlayerVote(s);return}
+  if(s.status==='finished'){
+    setPlayerPanel('playerResultPanel');$('resultEmoji').textContent=s.winner?.id===playerId?'🏆':'🌀';
+    $('playerResultTitle').textContent=s.winner?.id===playerId?'YOU WON THE BRACKET!':`${s.winner?.name||'Someone'} won this round`;
+    $('playerResultInfo').textContent='The host can launch another random object with the same room.';
+  }
+}
+function renderPlayerVote(s){
+  const m=s.currentMatch;
+  if(!m){$('playerMatchTitle').textContent=s.lastResult?'A morph advances!':'Building the bracket…';$('voteInstruction').textContent='Next matchup incoming…';$('playerMatch').innerHTML='';$('playerVoteProgress').textContent='';return}
+  const playing=m.left.id===playerId||m.right.id===playerId,vote=m.votes?.[playerId];
+  $('playerMatchTitle').textContent=`Bracket ${m.round} · Which got closer?`;
+  $('voteInstruction').textContent=playing?'Your morph is in this matchup — you sit this vote out.':'Tap the transformation that looks closest to the target.';
+  $('playerMatch').innerHTML=[m.left,m.right].map(side=>`<button class="voteChoice${vote===side.id?' selected':''}" data-choice="${side.id}" type="button" ${playing?'disabled':''}><img src="${side.image}" alt="${esc(side.name)} morph"><b>${esc(side.name)}</b></button>`).join('');
+  $('playerMatch').querySelectorAll('.voteChoice').forEach(btn=>btn.onclick=()=>{if(!playing)send('vote',{id:playerId,choice:btn.dataset.choice})});
+  $('playerVoteProgress').textContent=`${Object.keys(m.votes||{}).length} / ${m.votesNeeded} votes in`;
+}
+
+$('hostButton').onclick=createHost;
+$('joinButton').onclick=joinRoom;
+$('startButton').onclick=startRound;
+$('forceVoteButton').onclick=startBracket;
+$('resolveButton').onclick=resolveMatch;
+$('nextRoundButton').onclick=startRound;
+$('copyLink').onclick=async()=>{const url=`${location.origin}/Object2/index.html?room=${room}`;try{await navigator.clipboard.writeText(url);toast('Join link copied.')}catch{toast('Could not copy the link.',true)}};
+$('submitMorphButton').onclick=()=>{
+  if(latestState?.status!=='morph'||!Object2Editor.isReady())return;
+  send('submit',{id:playerId,image:Object2Editor.export()});$('submittedNote').classList.remove('hidden');toast('Morph submitted!');
+};
+
+const q=new URLSearchParams(location.search);
+if(q.has('room')){
+  const code=q.get('room').trim().toUpperCase().slice(0,5);$('joinCode').value=code;$('joinRoomValue').textContent=code;$('joinRoomPill').classList.remove('hidden');$('roomField').classList.add('hidden');setTimeout(()=>$('playerName').focus(),100);
+}
+window.addEventListener('beforeunload',stopChannel);
+showScreen('home');
