@@ -11,6 +11,8 @@
   const $ = id => document.getElementById(id);
   let lastRoom = '';
   let qrRetryTimer = null;
+  let endWatchChannel = null;
+  let endWatchRoom = '';
 
   function roomCode() {
     const value = ($('roomCode')?.textContent || '').trim().toUpperCase();
@@ -82,13 +84,80 @@
   function syncStartButton() {
     const start = $('start');
     const count = Number($('playerCount')?.textContent || 0);
-    if (!start || count !== 0) return;
+    if (!start) return;
 
     const title = start.querySelector('span');
     const note = start.querySelector('small');
-    if (title && title.textContent !== 'WAITING FOR PLAYERS') title.textContent = 'WAITING FOR PLAYERS';
-    if (note && note.textContent !== 'Share the QR or join code to begin') note.textContent = 'Share the QR or join code to begin';
+    if (count === 0) {
+      if (title && title.textContent !== 'WAITING FOR PLAYERS') title.textContent = 'WAITING FOR PLAYERS';
+      if (note && note.textContent !== 'Share the QR or join code to begin') note.textContent = 'Share the QR or join code to begin';
+    }
+
+    const mobile = $('mobileHostStart');
+    if (mobile) {
+      mobile.disabled = start.disabled;
+      mobile.textContent = start.disabled ? 'WAITING FOR PLAYERS' : (count === 1 ? 'START SOLO' : 'START RACE');
+      mobile.classList.toggle('hidden', $('hostLobby')?.classList.contains('hidden') ?? true);
+    }
   }
+
+  function installMobileHostStart() {
+    if ($('mobileHostStart') || !$('host')) return;
+    const button = document.createElement('button');
+    button.id = 'mobileHostStart';
+    button.className = 'mobile-host-start hidden';
+    button.type = 'button';
+    button.textContent = 'WAITING FOR PLAYERS';
+    button.disabled = true;
+    button.addEventListener('click', () => $('start')?.click());
+    $('host').appendChild(button);
+
+    if (!document.getElementById('mobileHostStyles')) {
+      const style = document.createElement('style');
+      style.id = 'mobileHostStyles';
+      style.textContent = `
+        .mobile-host-start{display:none}
+        @media(max-width:700px){
+          .host-screen{padding-bottom:calc(92px + env(safe-area-inset-bottom))!important}
+          .mobile-host-start:not(.hidden){position:fixed;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:90;display:block;min-height:64px;border:0;border-radius:19px;background:linear-gradient(135deg,var(--lime),#95ed50);color:#102014;font:inherit;font-size:1rem;font-weight:1000;letter-spacing:.04em;box-shadow:0 8px 0 #528932,0 18px 40px #0008}
+          .mobile-host-start:disabled{background:#647b5c;color:#17301e;box-shadow:0 7px 0 #40543b;opacity:1}
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  function kickPlayerToMain() {
+    try { if (typeof stopConnection === 'function') stopConnection(); } catch {}
+    try { sessionStorage.removeItem('ribbit-player'); } catch {}
+    try { if (endWatchChannel && typeof db !== 'undefined') db.removeChannel(endWatchChannel); } catch {}
+    endWatchChannel = null;
+    endWatchRoom = '';
+    location.replace('/Stick_Grow/stick_grow.html?ended=1');
+  }
+
+  function watchForEndedRoom() {
+    try {
+      if (typeof db === 'undefined' || typeof mode === 'undefined' || typeof room === 'undefined') return;
+      if (mode !== 'player' || !room || endWatchRoom === room) return;
+
+      if (endWatchChannel) db.removeChannel(endWatchChannel).catch(() => {});
+      endWatchRoom = room;
+      endWatchChannel = db.channel(`ribbit-room-ended-${room}-${Date.now()}`)
+        .on('postgres_changes', { event:'DELETE', schema:'public', table:'ribbit_updates' }, payload => {
+          if (payload?.old?.room_code === endWatchRoom) kickPlayerToMain();
+        })
+        .subscribe();
+    } catch (error) {
+      console.warn('Could not watch room end', error);
+    }
+  }
+
+  // Core refresh already catches "Room not found". This makes the fallback
+  // navigate cleanly to the game's main screen instead of leaving stale state.
+  try {
+    if (typeof leaveEndedRoom === 'function') leaveEndedRoom = kickPlayerToMain;
+  } catch {}
 
   const copyCode = $('copyCode');
   if (copyCode) {
@@ -110,15 +179,29 @@
     });
   }
 
+  // Hosting is supported on phones too; make that clear on the landing screen.
+  const launchNote = $('launch')?.querySelector('small');
+  if (launchNote) launchNote.textContent = 'Works on phone, tablet, TV or laptop';
+
+  installMobileHostStart();
+
   const roomNode = $('roomCode');
   const countNode = $('playerCount');
-  if (roomNode) new MutationObserver(syncRoom).observe(roomNode, { childList: true, characterData: true, subtree: true });
-  if (countNode) new MutationObserver(syncStartButton).observe(countNode, { childList: true, characterData: true, subtree: true });
+  const startNode = $('start');
+  const lobbyNode = $('hostLobby');
+  if (roomNode) new MutationObserver(syncRoom).observe(roomNode, { childList:true, characterData:true, subtree:true });
+  if (countNode) new MutationObserver(syncStartButton).observe(countNode, { childList:true, characterData:true, subtree:true });
+  if (startNode) new MutationObserver(syncStartButton).observe(startNode, { attributes:true, childList:true, characterData:true, subtree:true });
+  if (lobbyNode) new MutationObserver(syncStartButton).observe(lobbyNode, { attributes:true, attributeFilter:['class'] });
+
+  setInterval(watchForEndedRoom, 700);
 
   window.addEventListener('load', () => {
     syncRoom();
     syncStartButton();
+    watchForEndedRoom();
   });
   syncRoom();
   syncStartButton();
+  watchForEndedRoom();
 })();
