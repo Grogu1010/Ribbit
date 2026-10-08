@@ -1,0 +1,45 @@
+:root{
+  font-family:Inter,ui-rounded,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#efffe4;background:#0b1510;--lime:#b6f36f;--ink:#0e1d14;--panel:#182b20;
+  --line:#3c5e45;--muted:#aec5b4
+}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:
+radial-gradient(circle at 13% -5%,#315f3e 0,transparent 32rem),
+radial-gradient(circle at 92% 10%,#233e32 0,transparent 26rem),#0b1510}
+button,input{font:inherit}.shell{max-width:1240px;margin:auto;padding:24px 20px 38px}
+.topbar{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;margin-bottom:22px}
+.ribbit{font-size:2.2rem;line-height:1;font-weight:950;letter-spacing:-.08em;color:var(--lime);text-decoration:none}
+.ribbit span{color:white}.titleblock h1{font-size:clamp(2.2rem,5vw,4.4rem);letter-spacing:-.07em;margin:0;line-height:.9}
+.titleblock sup{font-size:.43em;vertical-align:top;margin-left:.05em}.titleblock p{margin:.55rem 0 0;color:var(--muted)}
+.progressBox{border:1px solid var(--line);background:#15251c;border-radius:16px;padding:11px 14px;text-align:right;min-width:110px}
+.progressBox strong,.progressBox span{display:block}.progressBox strong{font-size:1.05rem}.progressBox span{color:var(--muted);font-size:.82rem;margin-top:3px}
+.playgrid{display:grid;grid-template-columns:1fr 52px 1fr;align-items:stretch;gap:0}
+.objectCard{border:1px solid var(--line);border-radius:28px;background:linear-gradient(180deg,#1b3124,#13251a);padding:18px;box-shadow:0 24px 60px #0005;overflow:hidden}
+.cardtop{display:flex;justify-content:space-between;align-items:baseline;gap:15px;margin-bottom:13px}.cardtop strong{font-size:1.25rem}
+.eyebrow{font-size:.7rem;letter-spacing:.16em;font-weight:900;color:var(--lime)}
+.stage,.goalstage{position:relative;aspect-ratio:1.38;border-radius:20px;overflow:hidden;background:
+linear-gradient(45deg,#112119 25%,transparent 25%) 0 0/22px 22px,
+linear-gradient(45deg,transparent 75%,#112119 75%) 0 0/22px 22px,
+linear-gradient(45deg,transparent 75%,#112119 75%) 11px -11px/22px 22px,
+linear-gradient(45deg,#112119 25%,#1d3326 25%) 11px -11px/22px 22px}
+canvas{width:100%;height:100%;display:block}.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#fff0,#fff0 6px,#fff018 7px);mix-blend-mode:soft-light}
+.successFlash{position:absolute;inset:0;background:radial-gradient(circle,var(--lime),transparent 70%);opacity:0;pointer-events:none}
+.successFlash.go{animation:flash .65s ease}@keyframes flash{0%{opacity:0}35%{opacity:.8}100%{opacity:0}}
+.goalstage{display:grid;place-items:center;background:radial-gradient(circle,#314f38,#13251a 70%)}
+.targetAsset{width:72%;height:72%;display:grid;place-items:center}.targetAsset img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 18px 20px #0005)}
+.targetAsset .nativeEmoji{font-size:clamp(6rem,15vw,11rem);filter:drop-shadow(0 18px 20px #0005)}
+.goalcopy{color:var(--muted);margin:14px 4px 2px;text-align:center}.arrow{display:grid;place-items:center;font-size:2rem;font-weight:900;color:var(--lime)}
+.meterWrap{margin-top:15px}.meterText{display:flex;justify-content:space-between;color:var(--muted);font-size:.88rem}.meterText strong{color:white}
+.meter{height:11px;border-radius:999px;background:#0d1911;overflow:hidden;margin-top:7px;border:1px solid #2d4935}.meter i{display:block;width:0;height:100%;background:linear-gradient(90deg,#75bf50,var(--lime));border-radius:999px;transition:width .18s ease}
+.toolbox{margin-top:20px;border:1px solid var(--line);border-radius:28px;background:#14251b;padding:22px;box-shadow:0 24px 60px #0004}
+.toolHeader{display:flex;justify-content:space-between;align-items:center;gap:16px}.toolHeader h2{margin:3px 0 0;font-size:1.45rem}.toolActions,.nav{display:flex;gap:9px}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:19px}.tool{display:block;padding:15px;border-radius:18px;background:#1d3325;border:1px solid #35563e}
+.tool>span{display:flex;align-items:center;gap:8px;font-weight:800}.tool b{font-size:1.2rem;color:var(--lime)}.tool em{margin-left:auto;font-style:normal;color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--lime);margin-top:15px;cursor:ew-resize}
+button{border:0;border-radius:13px;padding:11px 15px;font-weight:900;cursor:pointer}.ghost{color:#e8f7e8;background:#25412f;border:1px solid #476c50}.primary{background:var(--lime);color:var(--ink)}
+button:disabled{opacity:.35;cursor:not-allowed}.statusrow{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px}.statusrow p{margin:0;color:var(--muted)}
+footer{display:flex;justify-content:space-between;gap:16px;color:#75927c;font-size:.78rem;margin:18px 6px 0}footer a{color:#97ba9d}
+dialog{border:1px solid #5f8d68;border-radius:26px;background:#16271d;color:#f4ffed;padding:28px;max-width:410px;width:calc(100% - 40px);text-align:center;box-shadow:0 30px 90px #000b}
+dialog::backdrop{background:#07100bcc;backdrop-filter:blur(5px)}dialog h2{margin:.5rem 0}.winEmoji{font-size:5.3rem;margin-bottom:4px}.winStats{color:var(--muted);margin:0 0 18px}
+@media(max-width:860px){.topbar{grid-template-columns:1fr auto}.ribbit{display:none}.titleblock h1{font-size:3rem}.playgrid{grid-template-columns:1fr}.arrow{height:48px;transform:rotate(90deg)}.tools{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.shell{padding:14px 12px 28px}.topbar{gap:10px}.progressBox{min-width:94px}.objectCard,.toolbox{border-radius:22px}.tools{grid-template-columns:1fr}.toolHeader,.statusrow,footer{align-items:stretch;flex-direction:column}.nav button{flex:1}.targetAsset{width:60%;height:60%}}
