@@ -1,4 +1,4 @@
-// Stick Grow v2 — Netlify frontend + Supabase multiplayer backend.
+// Stick Grow v3 — Netlify frontend + Supabase multiplayer backend.
 const SUPABASE_URL='https://enekvsumzfgeafimjfai.supabase.co';
 const SUPABASE_KEY='sb_publishable_p53PUyE4VpJ-vnNx731pBw_r5APaosj';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -7,8 +7,12 @@ const $=id=>document.getElementById(id);
 let mode='',room='',playerId='',token='',snapshot=null,channel=null,refreshTimer=null;
 let soundOn=localStorage.getItem('ribbit-sound')!=='off';
 let qrRoom='',feedbackTimer=null,freezeTimer=null;
+let composedWord='',selectedPower='';
 
-const show=id=>['home','host','player'].forEach(v=>$(v).classList.toggle('hidden',v!==id));
+function show(id){
+  ['home','host','player'].forEach(v=>$(v).classList.toggle('hidden',v!==id));
+  document.body.classList.toggle('player-mode',id==='player');
+}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 async function action(p_action,other={}){
@@ -33,8 +37,8 @@ function notice(message,type='good'){
   if(!el)return;
   clearTimeout(feedbackTimer);
   el.textContent=message;
-  el.className='feedback show'+(type==='bad'?' bad':type==='big'?' big':'');
-  feedbackTimer=setTimeout(()=>el.className='feedback',3200);
+  el.className='feedback compact-feedback show'+(type==='bad'?' bad':type==='big'?' big':'');
+  feedbackTimer=setTimeout(()=>el.className='feedback compact-feedback',2600);
 }
 
 function sound(kind='tick'){
@@ -66,6 +70,34 @@ function tiles(letters){
   return (letters||[]).map(l=>`<div class="tile">${esc(l)}</div>`).join('');
 }
 
+function hiveMarkup(letters){
+  return (letters||[]).slice(0,7).map((l,i)=>`<button class="hive-letter h${i}" type="button" data-letter="${esc(l)}" aria-label="Add ${esc(l)}">${esc(l)}</button>`).join('');
+}
+
+function syncWordUI(){
+  const hidden=$('word'),preview=$('wordPreview'),submit=$('submit');
+  if(hidden)hidden.value=composedWord;
+  if(preview)preview.innerHTML=composedWord?`<strong>${esc(composedWord)}</strong>`:'<span>Tap letters</span>';
+  const frozen=$('player')?.classList.contains('is-frozen');
+  if(submit)submit.disabled=!composedWord||frozen;
+}
+
+function bindHive(){
+  const hive=$('letterHive');
+  if(!hive)return;
+  hive.querySelectorAll('.hive-letter').forEach(button=>{
+    button.onclick=()=>{
+      if(composedWord.length>=30||$('player').classList.contains('is-frozen'))return;
+      composedWord+=button.dataset.letter||'';
+      syncWordUI();
+      sound('tick');
+      button.classList.remove('tapped');
+      void button.offsetWidth;
+      button.classList.add('tapped');
+    };
+  });
+}
+
 function branchMarkup(percent){
   let branches='';
   if(percent>24)branches+='<i class="branch b1"><i class="leaf"></i></i>';
@@ -95,6 +127,43 @@ function lane(p,goal,rank=1,leader=false,compact=false){
 
 function rankedPlayers(r){
   return [...(r.players||[])].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
+}
+
+function closeTargetPicker(){
+  selectedPower='';
+  $('targetPicker')?.classList.add('hidden');
+}
+
+function openTargetPicker(power){
+  if(!snapshot)return;
+  const me=snapshot.players.find(p=>p.id===playerId);
+  if(!me)return;
+  if((power==='snap'&&me.snapUsed)||(power==='freeze'&&me.freezeUsed)){
+    notice(`${power==='snap'?'SNAP':'FREEZE'} already used.`,'bad');
+    return;
+  }
+
+  const rivals=rankedPlayers(snapshot).filter(p=>p.id!==playerId);
+  if(!rivals.length){notice('No rival to target yet.','bad');return;}
+
+  selectedPower=power;
+  $('targetPowerTitle').textContent=power==='snap'?'✂️ SNAP WHO?':'❄️ FREEZE WHO?';
+  $('targets').innerHTML=rivals.map(p=>`
+    <button class="target-pick" type="button" data-id="${esc(p.id)}">
+      <span>${esc(p.name)}</span><b>${p.score}</b>
+    </button>`).join('');
+
+  $('targets').querySelectorAll('.target-pick').forEach(button=>button.onclick=()=>safe(async()=>{
+    const chosen=selectedPower;
+    if(!chosen)return;
+    await action('power',{p_power:chosen,p_target:button.dataset.id});
+    closeTargetPicker();
+    notice(chosen==='snap'?'✂️ SNAP SENT!':'❄️ FREEZE SENT!','big');
+    sound(chosen==='snap'?'snap':'freeze');
+    await refresh();
+  }));
+
+  $('targetPicker').classList.remove('hidden');
 }
 
 function updateQR(){
@@ -144,9 +213,9 @@ function inferEvents(current,previous){
     const old=oldMap.get(p.id);if(!old)continue;
     const delta=p.score-old.score;
     if(delta>0){
-      showEvent(`${p.name} grew +${delta}!`,delta>=18?'big':'');
-      sound(delta>=18?'big':'grow');
-      if(delta>=18)shake();
+      showEvent(`${p.name} grew +${delta}!`,delta>=54?'big':'');
+      sound(delta>=54?'big':'grow');
+      if(delta>=54)shake();
     }else if(delta<0){
       showEvent(`✂️ SNAP! ${p.name} lost ${Math.abs(delta)} growth`,'bad');sound('snap');shake();
       const laneEl=document.querySelector(`.lane[data-player="${CSS.escape(p.id)}"]`);
@@ -214,12 +283,14 @@ function render(r,previous){
   if(mode==='player'){
     const me=r.players.find(p=>p.id===playerId);
     const rank=Math.max(1,ranked.findIndex(p=>p.id===playerId)+1);
+    const playing=r.status==='playing';
+    document.body.classList.toggle('player-live',playing);
+
     $('playerRoomCode').textContent=r.code;
     $('playerRank').textContent=me?`#${rank}`:'#–';
     $('playerInfo').textContent=`${r.players.length}/12 players · first to ${r.goal}`;
-    $('playerLetters').innerHTML=tiles(r.letters);
-    $('playControls').classList.toggle('hidden',r.status!=='playing');
-    $('waitingCard').classList.toggle('hidden',r.status==='playing');
+    $('playerWaitingUi').classList.toggle('hidden',playing);
+    $('playControls').classList.toggle('hidden',!playing);
 
     if(r.status==='lobby')$('playerStatus').textContent='You’re in. Eyes on the TV!';
     else if(r.status==='finished')$('playerStatus').textContent=r.winner===playerId?'YOU GREW THE BIGGEST! 🏆':'Race over!';
@@ -227,22 +298,31 @@ function render(r,previous){
 
     $('boostBadge').classList.toggle('active',!!me?.boost);
     $('boostBadge').title=me?.boost?'Permanent 2× growth is active':'Get a 10-letter word to unlock 2×';
-    $('myProgress').innerHTML=me?lane(me,r.goal,rank,rank===1,true):'';
-    $('myScoreText').textContent=me?`${me.score} / ${r.goal}`:`0 / ${r.goal}`;
 
-    $('targets').innerHTML=ranked.filter(p=>p.id!==playerId).map(p=>`
-      <div class="target-row">
-        <span class="target-name">${esc(p.name)} <small>${p.score}</small></span>
-        <button class="power-btn snap" data-type="snap" data-id="${esc(p.id)}" ${me?.snapUsed?'disabled':''}>✂️ SNAP</button>
-        <button class="power-btn freeze" data-type="freeze" data-id="${esc(p.id)}" ${me?.freezeUsed?'disabled':''}>❄️ FREEZE</button>
-      </div>`).join('') || '<div class="empty-lobby">No rivals yet. Enjoy the peace.</div>';
+    if(playing){
+      $('mobileRank').textContent=me?`#${rank}`:'#–';
+      $('mobileScore').textContent=me?me.score:'0';
+      $('mobileBoost').classList.toggle('active',!!me?.boost);
+      $('mobileBoost').setAttribute('aria-label',me?.boost?'Double growth active':'Double growth locked');
 
-    $('targets').querySelectorAll('button').forEach(b=>b.onclick=()=>safe(async()=>{
-      await action('power',{p_power:b.dataset.type,p_target:b.dataset.id});
-      notice(b.dataset.type==='snap'?'✂️ SNAP SENT!':'❄️ FREEZE SENT!','big');
-      sound(b.dataset.type==='snap'?'snap':'freeze');
-      await refresh();
-    }));
+      const letterKey=(r.letters||[]).join('');
+      if($('letterHive').dataset.letters!==letterKey){
+        $('letterHive').dataset.letters=letterKey;
+        $('letterHive').innerHTML=hiveMarkup(r.letters);
+        bindHive();
+      }
+
+      const hasRival=r.players.some(p=>p.id!==playerId);
+      $('snapAction').disabled=!hasRival||!!me?.snapUsed;
+      $('freezeAction').disabled=!hasRival||!!me?.freezeUsed;
+      $('snapAction').classList.toggle('used',!!me?.snapUsed);
+      $('freezeAction').classList.toggle('used',!!me?.freezeUsed);
+      syncWordUI();
+    }else{
+      closeTargetPicker();
+      composedWord='';
+      syncWordUI();
+    }
 
     applyFreeze(me);
     if(r.status==='finished'&&previous?.status!=='finished'){
@@ -258,8 +338,8 @@ function applyFreeze(me){
   const frozen=until>Date.now();
   $('player').classList.toggle('is-frozen',frozen);
   $('freezeBanner').classList.toggle('hidden',!frozen);
-  $('word').disabled=frozen;
-  $('submit').disabled=frozen;
+  $('letterHive')?.querySelectorAll('.hive-letter').forEach(button=>button.disabled=frozen);
+  syncWordUI();
   if(frozen){
     const left=Math.max(100,until-Date.now()+120);
     freezeTimer=setTimeout(()=>refresh(),left);
@@ -289,7 +369,7 @@ $('join').onclick=()=>safe(async()=>{
   if(!code||!name)throw Error('Enter a room code and your name.');
   room=code;
   const r=await action('join',{p_name:name});
-  room=r.code;playerId=r.id;token=r.token;mode='player';snapshot=null;
+  room=r.code;playerId=r.id;token=r.token;mode='player';snapshot=null;composedWord='';
   sessionStorage.setItem('ribbit-player',JSON.stringify({room,playerId,token}));
   show('player');sound('tick');await connect();
 });
@@ -307,25 +387,36 @@ $('copyLink').onclick=()=>safe(async()=>{
   setTimeout(()=>$('copyLink').textContent='COPY JOIN LINK',1500);
 });
 
+$('undoLetter').onclick=()=>{
+  composedWord=composedWord.slice(0,-1);
+  syncWordUI();
+  sound('tick');
+};
+$('clearWord').onclick=()=>{
+  composedWord='';
+  syncWordUI();
+  sound('tick');
+};
+$('snapAction').onclick=()=>openTargetPicker('snap');
+$('freezeAction').onclick=()=>openTargetPicker('freeze');
+$('closeTargets').onclick=closeTargetPicker;
+$('targetPicker').addEventListener('click',e=>{if(e.target===$('targetPicker'))closeTargetPicker()});
+
 $('submit').onclick=()=>safe(async()=>{
-  const word=$('word').value.trim();
+  const word=composedWord.trim();
   if(!word)return;
   $('submit').disabled=true;
   try{
     const r=await action('word',{p_word:word});
-    const big=r.points>=18;
-    notice(`+${r.points} GROWTH${r.boost?' · ×2 ACTIVE!':''}`,big?'big':'good');
+    const big=r.points>=54;
+    notice(`+${r.points}${r.boost?' · ×2 ACTIVE!':''}`,big?'big':'good');
     sound(big?'big':'grow');
-    $('word').value='';
+    composedWord='';
+    syncWordUI();
     await refresh();
   }finally{
-    if(!$('player').classList.contains('is-frozen'))$('submit').disabled=false;
-    $('word').focus();
+    syncWordUI();
   }
-});
-
-$('word').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){e.preventDefault();$('submit').click()}
 });
 
 const q=new URLSearchParams(location.search);
