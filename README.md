@@ -1,29 +1,22 @@
 # Ribbit 🐸
 
-A browser-based party game hub. First game: **Stick Grow** (1–12 players).
+Ribbit is a Netlify-hosted party-game hub. Its first game, **Stick Grow**, supports 1–12 players using phones as controllers.
 
-## Run
+## Setup (no local Node.js required)
 
-Requires Node.js 20+.
+1. Connect this GitHub repository to **Netlify**. The included `netlify.toml` sets the publish directory to `public` and routes `/` to the homepage. Leave the build command empty.
+2. Open [Supabase SQL Editor](https://supabase.com/dashboard) for your project, create a new query, copy **all of [supabase/setup.sql](supabase/setup.sql)** into it, and click **Run**. This creates tables, secure database actions, a starter word dictionary, and realtime publication.
+3. Netlify should redeploy automatically after the GitHub commits. If not, choose **Deploys → Trigger deploy**.
+4. Visit the Netlify URL, choose **Launch game (TV)**, and create a room. Players can visit the same URL, join with the five-character room code, and race.
 
-```bash
-npm install
-npm start
-```
+The public Supabase URL and **publishable** key are configured in `public/Stick_Grow/stick_grow.js`. These are safe for client-side use. **Never put a Supabase secret/service-role key or database password in this repository.**
 
-Open http://localhost:3000 on a laptop/TV, choose **Launch game**, then open the same address on each player's phone, select **Join room**, and enter the five-character code. For phones on the same Wi-Fi, use the computer's LAN IP instead of localhost. For internet play, deploy the Node.js app to a hosting service that supports persistent WebSocket connections (not static GitHub Pages).
+## How multiplayer works
 
-## Stick Grow rules
+Netlify serves HTML/CSS/JS. The browser connects to Supabase directly. The database function `ribbit_action` validates all game actions and is the only path for score updates. A room-updates table publishes realtime ticks, and clients fetch sanitized room state through the RPC. The game also polls every four seconds as a fallback.
 
-- Each race gives everyone the same 7 letters (exactly 2 vowels, 5 consonants).
-- Letters can repeat within words and across submissions. Each *distinct* word scores once per player per race.
-- The server checks submitted words against the installed English word list.
-- The seven-letter sets are selected from 10-letter dictionary words, guaranteeing at least one 10-letter solution for each set.
-- Word score is its length; the first valid word of 10 or more letters unlocks **permanent 2× word-length scoring**, including that word.
-- First to **180** growth points wins.
-- Each player gets one **Snap** (−15 points to a rival) and one **Freeze** (5 seconds) per race.
-- Host can start and reset games.
+Each round gives seven letters (two vowels, five consonants) with a known 10-letter word. Players may reuse letters within a word, but each distinct word scores only once per player. First valid 10-letter word enables permanent 2× scoring. First to 180 wins. Each player can use Snap (−15) and Freeze (5 seconds) once per race.
 
-## Notes
+## Current limitations
 
-This is an MVP. Rooms are in memory and disappear on server restart; no user accounts or persistent leaderboards. The word list is broad and may contain obscure words; curate it for production. The app currently has one game card, designed for more games later.
+The SQL includes a **small starter dictionary**, not the full English dictionary. More words must be imported into `public.ribbit_words` before general release. There are currently two letter pools: `BEKOPRS` (BOOKKEEPER) and `ACDORST` (CROSSROADS). Room codes are public and room state is visible to anyone who knows the code; host and player action tokens are stored in sessionStorage. There is no login, anti-spam throttling, cleanup of expired rooms, or automated multiplayer test suite yet. The old `server.js` and `package.json` are retained as legacy Node/Socket.IO files but **are not used by Netlify**.
