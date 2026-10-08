@@ -1,0 +1,1 @@
+document.getElementById('joinForm').addEventListener('submit',event=>{event.preventDefault();const room=document.getElementById('joinCode').value.trim().toUpperCase();const name=document.getElementById('name').value.trim();if(room&&name)location.href='/stick_grow.html?room='+encodeURIComponent(room)+'&name='+encodeURIComponent(name)});
