@@ -412,3 +412,23 @@ body.player-live .player-screen{
   .hive-grow{min-height:48px}
   .compact-feedback{min-height:30px;height:30px;font-size:.74rem;padding:5px 8px}
 }
+
+/* v4: proportional honeycomb, no misleading centre highlight, and a calm bottom half. */
+@media(max-width:700px){
+ body.player-live .player-screen{height:100dvh;min-height:100dvh;padding:clamp(10px,2dvh,18px) 16px max(12px,env(safe-area-inset-bottom));box-sizing:border-box}
+ body.player-live .compact-controller{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;gap:clamp(10px,2dvh,18px);height:100%}
+ body.player-live .player-game-hud{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,1.1fr) minmax(0,1fr);gap:9px;flex:0 0 auto}
+ body.player-live .hud-power,body.player-live .player-score-cluster{min-height:68px;max-height:82px}
+ body.player-live .word-preview-wrap{flex:0 0 auto}
+ body.player-live .letter-hive{--hive-size:min(72vw, min(37dvh, 290px));width:var(--hive-size);height:var(--hive-size);flex:0 0 auto;margin:8px auto 6px;align-self:center}
+ body.player-live .hive-letter{width:30%;height:34%;font-size:clamp(1.65rem,7vw,2.2rem);box-shadow:none}
+ body.player-live .hive-letter.h0{background:linear-gradient(150deg,#f4ffce,#bfe96e);filter:none}
+ body.player-live .hive-letter.h1{top:17%}
+ body.player-live .hive-letter.h2{left:78%;top:33.5%}
+ body.player-live .hive-letter.h3{left:78%;top:66.5%}
+ body.player-live .hive-letter.h4{top:83%}
+ body.player-live .hive-letter.h5{left:22%;top:66.5%}
+ body.player-live .hive-letter.h6{left:22%;top:33.5%}
+ body.player-live .hive-grow{width:100%;height:clamp(60px,8dvh,76px);min-height:60px;flex:0 0 auto;margin:0;border-radius:20px;font-size:1.15rem}
+ body.player-live .compact-feedback{flex:0 0 auto}
+}
