@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101d17">
+  <title>Object² · Ribbit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="ribbit" href="/Home/index.html">ribbit<span>.</span></a>
+      <div class="titleblock">
+        <h1>Object<sup>2</sup></h1>
+        <p>Twist one thing until it becomes another.</p>
+      </div>
+      <div class="progressBox" aria-label="Game progress">
+        <strong id="levelLabel">01 / 70</strong>
+        <span id="bestLabel">0 solved</span>
+      </div>
+    </header>
+
+    <section class="playgrid">
+      <article class="objectCard sourceCard">
+        <div class="cardtop">
+          <span class="eyebrow">START WITH</span>
+          <strong id="sourceName">Water bottle</strong>
+        </div>
+        <div class="stage" id="stage">
+          <canvas id="canvas" width="720" height="520" aria-label="Transformable object"></canvas>
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="successFlash" id="successFlash" aria-hidden="true"></div>
+        </div>
+        <div class="meterWrap">
+          <div class="meterText"><span>Similarity</span><strong id="scoreText">0%</strong></div>
+          <div class="meter"><i id="meterFill"></i></div>
+        </div>
+      </article>
+
+      <div class="arrow" aria-hidden="true">→</div>
+
+      <article class="objectCard targetCard">
+        <div class="cardtop">
+          <span class="eyebrow">MAKE IT</span>
+          <strong id="targetName">Dog</strong>
+        </div>
+        <div class="goalstage">
+          <div class="targetAsset" id="targetAsset" role="img" aria-label="Target object"></div>
+        </div>
+        <p class="goalcopy" id="goalCopy">Get to 94% similarity to morph it.</p>
+      </article>
+    </section>
+
+    <section class="toolbox">
+      <div class="toolHeader">
+        <div>
+          <span class="eyebrow">YOUR TOOLS</span>
+          <h2>Shape the object</h2>
+        </div>
+        <div class="toolActions">
+          <button class="ghost" id="resetBtn" type="button">Reset</button>
+          <button class="ghost" id="hintBtn" type="button">Hint</button>
+        </div>
+      </div>
+
+      <div class="tools">
+        <label class="tool">
+          <span><b>↻</b> Rotate <em id="rotateValue">0°</em></span>
+          <input id="rotate" type="range" min="-180" max="180" value="0" step="1">
+        </label>
+        <label class="tool">
+          <span><b>〰</b> Warp <em id="warpValue">0</em></span>
+          <input id="warp" type="range" min="-100" max="100" value="0" step="1">
+        </label>
+        <label class="tool">
+          <span><b>↔</b> Stretch <em id="stretchValue">100%</em></span>
+          <input id="stretch" type="range" min="50" max="150" value="100" step="1">
+        </label>
+        <label class="tool">
+          <span><b>◉</b> Fisheye <em id="fisheyeValue">0</em></span>
+          <input id="fisheye" type="range" min="-100" max="100" value="0" step="1">
+        </label>
+      </div>
+
+      <div class="statusrow">
+        <p id="hintText">Move any tool to begin.</p>
+        <div class="nav">
+          <button class="ghost" id="randomBtn" type="button">Shuffle</button>
+          <button class="primary" id="nextBtn" type="button" disabled>Next object →</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Object² has 70 transformations.</span>
+      <span>Web object art: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noreferrer">Twemoji</a>, CC-BY 4.0.</span>
+    </footer>
+  </main>
+
+  <dialog id="winDialog">
+    <div class="winEmoji" id="winEmoji">🐶</div>
+    <span class="eyebrow">OBJECT MORPHED</span>
+    <h2 id="winTitle">Water bottle → Dog</h2>
+    <p id="winStats">Solved in 0 moves.</p>
+    <button class="primary" id="continueBtn" type="button">Next object →</button>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
