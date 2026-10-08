@@ -7,6 +7,8 @@
   <title>Stick Grow · Ribbit</title>
   <link rel="stylesheet" href="/Home/style.css">
   <link rel="stylesheet" href="stick_grow.css">
+  <link rel="stylesheet" href="stick_grow_polish.css">
+  <link rel="stylesheet" href="stick_grow_controller.css">
 </head>
 <body class="stick-grow-page">
   <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
@@ -65,15 +67,32 @@
           <strong id="roomCode" class="mini-code">-----</strong>
         </div>
         <div id="hostRoundLabel" class="host-round-label">LOBBY</div>
-        <button id="copyLink" class="ghost-btn" type="button">COPY JOIN LINK</button>
+        <div class="host-actions">
+          <button id="copyLink" class="ghost-btn" type="button">COPY JOIN LINK</button>
+        </div>
       </div>
 
       <div id="hostLobby" class="host-lobby">
         <article class="qr-card">
           <div class="eyebrow">SCAN TO JOIN</div>
+          <div class="join-kicker">Point a phone camera here</div>
           <div id="qrCode" class="qr-box" aria-label="QR code to join the room"></div>
-          <div id="bigRoomCode" class="code">-----</div>
+
+          <div class="room-code-panel">
+            <span class="room-code-label">OR ENTER JOIN CODE</span>
+            <div class="room-code-row">
+              <div id="bigRoomCode" class="code">-----</div>
+              <button id="copyCode" class="copy-code-btn" type="button" aria-label="Copy room code">⧉</button>
+            </div>
+          </div>
+
           <p id="joinUrl" class="join-url"></p>
+
+          <div class="join-steps" aria-label="How to join">
+            <div class="join-step"><b>01</b><span>Scan or enter code</span></div>
+            <div class="join-step"><b>02</b><span>Pick your frog name</span></div>
+            <div class="join-step"><b>03</b><span>Watch this screen</span></div>
+          </div>
         </article>
 
         <article class="lobby-card">
@@ -81,12 +100,14 @@
             <div>
               <div class="eyebrow">WHO'S IN?</div>
               <h2><span id="playerCount">0</span> / 12 frogs ready</h2>
+              <p class="lobby-subtitle">Names appear here as players join from their phones.</p>
             </div>
             <div class="lobby-pulse" aria-hidden="true"><i></i><i></i><i></i></div>
           </div>
           <div id="lobbyPlayers" class="player-chips">
             <div class="empty-lobby">Waiting for the first frog…</div>
           </div>
+          <p class="lobby-tip">You can start with one player, or wait for the whole pond.</p>
           <button id="start" class="primary huge start-btn" type="button" disabled>
             <span>START RACE</span>
             <small>First to 60 growth wins</small>
@@ -121,71 +142,80 @@
     </section>
 
     <section id="player" class="player-screen hidden">
-      <div class="phone-head">
-        <div>
-          <span class="strip-label">ROOM</span>
-          <strong id="playerRoomCode">-----</strong>
+      <div id="playerWaitingUi" class="player-waiting-ui">
+        <div class="phone-head">
+          <div>
+            <span class="strip-label">ROOM</span>
+            <strong id="playerRoomCode">-----</strong>
+          </div>
+          <div id="playerRank" class="rank-badge">#–</div>
         </div>
-        <div id="playerRank" class="rank-badge">#–</div>
+
+        <article class="phone-status">
+          <div>
+            <div class="eyebrow">STICK GROW</div>
+            <h2 id="playerStatus">Waiting for the host…</h2>
+            <p id="playerInfo" class="muted"></p>
+          </div>
+          <div id="boostBadge" class="boost-badge">×2</div>
+        </article>
+
+        <div id="waitingCard" class="waiting-card">
+          <div class="waiting-frog">🐸</div>
+          <h3>You're in!</h3>
+          <p>When the race starts, your phone becomes the controller.</p>
+          <div class="mini-tutorial">
+            <div><b>1</b><span>Tap letters in any order to build a word.</span></div>
+            <div><b>2</b><span>Hit GROW and watch your stick move on the big screen.</span></div>
+            <div><b>3</b><span>SNAP and FREEZE each work once per race.</span></div>
+          </div>
+        </div>
       </div>
 
-      <article class="phone-status">
-        <div>
-          <div class="eyebrow">STICK GROW</div>
-          <h2 id="playerStatus">Waiting for the host…</h2>
-          <p id="playerInfo" class="muted"></p>
+      <div id="playControls" class="play-controls compact-controller hidden">
+        <div class="player-game-hud">
+          <button id="snapAction" class="hud-power snap" type="button">✂️<span>SNAP</span></button>
+
+          <div class="player-score-cluster">
+            <span id="mobileRank" class="mobile-rank">#–</span>
+            <strong id="mobileScore" class="mobile-score">0</strong>
+            <span id="mobileBoost" class="mobile-boost">×2</span>
+          </div>
+
+          <button id="freezeAction" class="hud-power freeze" type="button">❄️<span>FREEZE</span></button>
         </div>
-        <div id="boostBadge" class="boost-badge">×2</div>
-      </article>
 
-      <div id="playerLetters" class="letters player-letters"></div>
-
-      <div id="playControls" class="play-controls hidden">
         <div id="freezeBanner" class="freeze-banner hidden">❄️ FROZEN — HOLD ON!</div>
 
-        <div class="word-entry">
-          <input id="word" placeholder="TYPE A WORD…" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
-          <button id="submit" class="grow-btn" type="button"><span>GROW!</span><b>➜</b></button>
+        <div class="word-preview-wrap">
+          <div id="wordPreview" class="word-preview" aria-live="polite"><span>Tap letters</span></div>
+          <button id="undoLetter" class="word-edit-btn" type="button" aria-label="Remove last letter">⌫</button>
+          <button id="clearWord" class="word-edit-btn" type="button" aria-label="Clear word">×</button>
         </div>
 
-        <div class="score-hint">
-          <span>5+ letters = bonus</span>
-          <span>7+ = BIG bonus</span>
-          <span>10+ = ×2 forever</span>
-        </div>
+        <div id="letterHive" class="letter-hive" aria-label="Letter buttons"></div>
 
-        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <button id="submit" class="grow-btn hive-grow" type="button"><span>GROW!</span><b>➜</b></button>
+        <input id="word" type="hidden" value="">
 
-        <section class="your-stick-card">
-          <div class="card-title">
-            <span>YOUR STICK</span>
-            <strong id="myScoreText">0 / 60</strong>
-          </div>
-          <div id="myProgress"></div>
-        </section>
+        <div id="feedback" class="feedback compact-feedback" aria-live="polite"></div>
 
-        <section class="power-card">
-          <div class="power-heading">
-            <div>
-              <div class="eyebrow">SABOTAGE</div>
-              <h3>Choose your victim</h3>
+        <div id="targetPicker" class="target-picker hidden" role="dialog" aria-modal="true" aria-labelledby="targetPowerTitle">
+          <div class="target-picker-card">
+            <div class="target-picker-head">
+              <strong id="targetPowerTitle">CHOOSE A FROG</strong>
+              <button id="closeTargets" type="button" aria-label="Close target picker">×</button>
             </div>
-            <p>Each power works once per race.</p>
+            <div id="targets" class="compact-targets"></div>
           </div>
-          <div id="targets" class="targets"></div>
-        </section>
-      </div>
-
-      <div id="waitingCard" class="waiting-card">
-        <div class="waiting-frog">🐸</div>
-        <h3>You're in!</h3>
-        <p>Look at the big screen. The host starts the chaos.</p>
+        </div>
       </div>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="stick_grow.js"></script>
+  <script src="stick_grow_polish.js"></script>
 </body>
 </html>
