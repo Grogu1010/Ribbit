@@ -95,12 +95,15 @@ begin
   end if;
 
   -- A host refresh/restart can explicitly destroy its previous room.
-  -- Cascading foreign keys remove players and the realtime update row too.
   if p_action = 'end' then
     if r.host_token is distinct from v_token then
       raise exception 'Host access required.';
     end if;
 
+    -- Wake connected players so their next state request immediately sees that
+    -- the room is gone, then clean the per-round used-word rows as well.
+    update public.ribbit_updates set version=version+1 where room_code=v_code;
+    delete from public.ribbit_used_words where room_code=v_code;
     delete from public.ribbit_rooms where code=v_code;
     return jsonb_build_object('ok',true);
   end if;
