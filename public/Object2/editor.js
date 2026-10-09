@@ -4,23 +4,16 @@ const canvas=$('morphCanvas'),ctx=canvas.getContext('2d',{alpha:true,desynchroni
 const texture=document.createElement('canvas'),tctx=texture.getContext('2d',{alpha:true});
 const meshCanvas=document.createElement('canvas'),mctx=meshCanvas.getContext('2d',{alpha:true,desynchronized:true});
 const MOBILE=matchMedia('(max-width:700px)').matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-const SIZE=MOBILE?420:560,GRID=MOBILE?9:12;
+const SIZE=MOBILE?420:560,GRID=MOBILE?10:12;
 canvas.width=canvas.height=SIZE;texture.width=texture.height=SIZE;meshCanvas.width=meshCanvas.height=SIZE;
 let mesh=[],gesture=null,currentTool='warp',ready=false,enabled=false,rotation=0;
 let raf=0,dirty=true;
 
-$('undoButton')?.remove();
-$('resetButton')?.remove();
-document.querySelector('.historyActions')?.remove();
-$('brushRing')?.remove();
-const brushRow=document.querySelector('.brushRow');
-if(brushRow)brushRow.innerHTML='<em id="toolHint">Warp: grab one exact part and drag it where you want it.</em>';
-
 const hints={
-  warp:'Warp: grab one exact part and drag it where you want it.',
+  warp:'Warp: grab one exact point and drag it where you want it.',
   rotate:'Rotate: drag left or right anywhere — the whole object turns.',
-  stretch:'Stretch: grab one exact part and pull it longer or squash it.',
-  fisheye:'Fisheye: grab one exact part and drag to bulge or pinch it.'
+  stretch:'Stretch: grab one exact point and pull it along one axis.',
+  fisheye:'Fisheye: grab one tiny area and drag to bulge or pinch it.'
 };
 const regularMesh=()=>{const a=[];for(let y=0;y<=GRID;y++)for(let x=0;x<=GRID;x++)a.push({x:x*SIZE/GRID,y:y*SIZE/GRID});return a};
 const cloneMesh=(source=mesh)=>source.map(p=>({x:p.x,y:p.y}));
@@ -67,19 +60,18 @@ function modelPoint(e){
   const p=screenPoint(e),cx=SIZE/2,cy=SIZE/2,dx=p.x-cx,dy=p.y-cy,co=Math.cos(-rotation),si=Math.sin(-rotation);
   return {x:cx+dx*co-dy*si,y:cy+dx*si+dy*co};
 }
-function preciseTargets(p){
-  let best=Infinity,anchor=0;
+function nearestIndex(p){
+  let best=Infinity,index=0;
   for(let i=0;i<mesh.length;i++){
     const dx=mesh[i].x-p.x,dy=mesh[i].y-p.y,d=dx*dx+dy*dy;
-    if(d<best){best=d;anchor=i}
+    if(d<best){best=d;index=i}
   }
-  const stride=GRID+1,row=Math.floor(anchor/stride),col=anchor%stride;
-  const targets=[{i:anchor,w:1}];
-  if(col>0)targets.push({i:anchor-1,w:.16});
-  if(col<GRID)targets.push({i:anchor+1,w:.16});
-  if(row>0)targets.push({i:anchor-stride,w:.16});
-  if(row<GRID)targets.push({i:anchor+stride,w:.16});
-  return targets;
+  return index;
+}
+function neighbours(index){
+  const stride=GRID+1,row=Math.floor(index/stride),col=index%stride,out=[];
+  if(col>0)out.push(index-1);if(col<GRID)out.push(index+1);if(row>0)out.push(index-stride);if(row<GRID)out.push(index+stride);
+  return out;
 }
 function apply(e){
   if(!gesture)return;
@@ -88,40 +80,30 @@ function apply(e){
     rotation=gesture.baseRotation+dx*Math.PI/SIZE;
     requestRender();return;
   }
-  const p=modelPoint(e),dx=p.x-gesture.start.x,dy=p.y-gesture.start.y;
+  const p=modelPoint(e),dx=p.x-gesture.start.x,dy=p.y-gesture.start.y,anchor=gesture.anchor;
   if(currentTool==='warp'){
-    const stepX=p.x-gesture.last.x,stepY=p.y-gesture.last.y;
-    if(Math.abs(stepX)+Math.abs(stepY)<.3)return;
-    for(const t of gesture.targets){
-      const pt=mesh[t.i];pt.x+=stepX*t.w;pt.y+=stepY*t.w;clampPoint(pt);
-    }
-    gesture.last=p;requestRender();return;
+    const stepX=p.x-gesture.last.x,stepY=p.y-gesture.last.y;if(Math.abs(stepX)+Math.abs(stepY)<.3)return;
+    const pt=mesh[anchor];pt.x+=stepX;pt.y+=stepY;clampPoint(pt);gesture.last=p;requestRender();return;
   }
   mesh=cloneMesh(gesture.base);
   if(currentTool==='stretch'){
-    const mag=Math.hypot(dx,dy);if(mag>1){
-      const ux=dx/mag,uy=dy/mag,amount=Math.min(SIZE*.42,mag)*1.12;
-      for(const t of gesture.targets){
-        const base=gesture.base[t.i],rx=base.x-gesture.start.x,ry=base.y-gesture.start.y;
-        const along=rx*ux+ry*uy,perp=-rx*uy+ry*ux;
-        const stretched=along*(1+Math.min(1.7,mag/(SIZE*.13))*t.w)+amount*t.w;
-        const pt=mesh[t.i];pt.x=gesture.start.x+ux*stretched-uy*perp;pt.y=gesture.start.y+uy*stretched+ux*perp;clampPoint(pt);
-      }
-    }
+    const base=gesture.base[anchor],pt=mesh[anchor];
+    if(Math.abs(dx)>=Math.abs(dy)){pt.x=base.x+dx*1.45;pt.y=base.y}
+    else{pt.x=base.x;pt.y=base.y+dy*1.45}
+    clampPoint(pt);
   }else if(currentTool==='fisheye'){
-    const amount=Math.max(-.78,Math.min(.95,(dx-dy)/(SIZE*.18)));
-    for(const t of gesture.targets){
-      const base=gesture.base[t.i],rx=base.x-gesture.start.x,ry=base.y-gesture.start.y;
-      const scale=Math.max(.28,1+amount*t.w);
-      const pt=mesh[t.i];pt.x=gesture.start.x+rx*scale;pt.y=gesture.start.y+ry*scale;clampPoint(pt);
+    const amount=Math.max(-.7,Math.min(.9,(dx-dy)/(SIZE*.17)));
+    for(const i of gesture.neighbours){
+      const base=gesture.base[i],rx=base.x-gesture.start.x,ry=base.y-gesture.start.y,scale=Math.max(.35,1+amount);
+      const pt=mesh[i];pt.x=gesture.start.x+rx*scale;pt.y=gesture.start.y+ry*scale;clampPoint(pt);
     }
   }
   requestRender();
 }
 canvas.addEventListener('pointerdown',e=>{
   if(!ready||!enabled)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);
-  const mp=modelPoint(e),sp=screenPoint(e);
-  gesture={start:mp,last:mp,base:cloneMesh(),startScreen:sp,baseRotation:rotation,targets:preciseTargets(mp)};
+  const mp=modelPoint(e),sp=screenPoint(e),anchor=nearestIndex(mp);
+  gesture={start:mp,last:mp,base:cloneMesh(),startScreen:sp,baseRotation:rotation,anchor,neighbours:neighbours(anchor)};
 },{passive:false});
 canvas.addEventListener('pointermove',e=>{if(gesture){e.preventDefault();apply(e)}},{passive:false});
 canvas.addEventListener('pointerup',e=>{if(gesture){apply(e);gesture=null;requestRender()}});
