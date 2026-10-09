@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1510">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Object² · Ribbit</title>
+  <link rel="stylesheet" href="style.css?v=20261009-precision4">
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <main class="shell">
+    <header class="topbar"><a class="ribbit" href="/">ribbit<span>.</span></a><div class="gameTitle">OBJECT<sup>2</sup></div><div class="liveDot"><i></i> PARTY MODE</div></header>
+
+    <section id="home" class="screen homeGrid">
+      <article class="heroCard">
+        <div class="eyebrow">MORPH IT. MATCH IT. VOTE IT.</div>
+        <h1>Turn an object<br>into <em>another.</em></h1>
+        <p>Everyone gets the same ridiculous transformation. Sculpt the emoji with four hands-on tools, submit your masterpiece, then vote through a head-to-head bracket for the closest morph.</p>
+        <div class="chips"><span>3–8 players</span><span>70 object pairs</span><span>Phone sculpting</span><span>Bracket voting</span></div>
+        <button id="hostButton" class="primary huge" type="button"><b>HOST ON THIS SCREEN</b><small>TV or laptop</small></button>
+      </article>
+      <article class="joinCard">
+        <div class="joinIcon">🌀</div><div class="eyebrow">JOIN ON YOUR PHONE</div><h2>Enter the room</h2><p class="muted">Scan the host QR code or type the five-character code.</p>
+        <div id="joinRoomPill" class="roomPill hidden">ROOM <strong id="joinRoomValue"></strong></div>
+        <label id="roomField" class="field"><span>ROOM CODE</span><input id="joinCode" maxlength="5" autocapitalize="characters" autocomplete="off" placeholder="ABCDE"></label>
+        <label class="field"><span>YOUR NAME</span><input id="playerName" maxlength="20" autocomplete="nickname" placeholder="Morph wizard"></label>
+        <button id="joinButton" class="primary" type="button">JOIN GAME →</button>
+      </article>
+    </section>
+
+    <section id="host" class="screen hidden">
+      <div class="hostStrip"><div><span>ROOM</span><strong id="hostRoomCode">-----</strong></div><div id="hostPhase" class="phasePill">LOBBY</div><button id="copyLink" class="ghost" type="button">COPY JOIN LINK</button></div>
+      <div id="hostLobby" class="hostLobby">
+        <article class="qrCard"><div class="eyebrow">SCAN TO JOIN</div><div id="qrCode" class="qrBox"></div><div id="joinUrl" class="joinUrl"></div></article>
+        <article class="lobbyCard"><div class="eyebrow">PLAYERS</div><div class="lobbyHead"><h2><span id="hostPlayerCount">0</span> / 8 joined</h2><span>Need at least 3</span></div><div id="hostPlayers" class="playerGrid"></div><button id="startButton" class="primary huge" type="button" disabled><b>START MORPHING</b><small>Everyone gets the same object</small></button></article>
+      </div>
+      <div id="hostRound" class="hidden">
+        <div class="promptCard"><div class="eyebrow">ROUND <span id="hostRoundNumber">1</span></div><div class="promptObjects"><div><span id="hostSourceEmoji" class="bigEmoji">🧴</span><b id="hostSourceName">Water bottle</b></div><strong>→</strong><div><span id="hostTargetEmoji" class="bigEmoji">🐶</span><b id="hostTargetName">Dog</b></div></div><p id="hostPromptText">Morph the first object into the second on your phones.</p></div>
+        <div id="hostMorphPanel" class="phaseCard hidden"><div class="phaseHead"><div><div class="eyebrow">MORPHING</div><h2>Waiting for masterpieces</h2></div><strong id="submitCount">0 / 0</strong></div><div id="submitGrid" class="submitGrid"></div><button id="forceVoteButton" class="ghost wide" type="button" disabled>START VOTING WITH SUBMITTED PLAYERS</button></div>
+        <div id="hostVotePanel" class="phaseCard hidden"><div class="phaseHead"><div><div class="eyebrow">BRACKET VOTING</div><h2 id="matchTitle">Round 1 · Match 1</h2></div><strong id="voteProgress">0 / 0 votes</strong></div><div id="hostMatch" class="matchup"></div><div id="bracketTrail" class="bracketTrail"></div><button id="resolveButton" class="ghost wide" type="button">RESOLVE NOW</button></div>
+        <div id="hostFinishedPanel" class="phaseCard winnerCard hidden"><div class="eyebrow">ROUND WINNER</div><h2 id="winnerName">WINNER!</h2><img id="winnerImage" alt="Winning morph"><div id="scoreboard" class="scoreboard"></div><button id="nextRoundButton" class="primary huge" type="button"><b>NEXT RANDOM OBJECT</b><small>Same room, new bracket</small></button></div>
+      </div>
+    </section>
+
+    <section id="player" class="screen playerScreen hidden">
+      <div class="playerTop"><a href="/" class="miniBrand">ribbit.</a><div><span>ROOM</span><strong id="playerRoomCode">-----</strong></div><div><span>SCORE</span><strong id="playerScore">0</strong></div></div>
+      <div id="playerLobby" class="phoneCard waitingCard"><div class="pulseEmoji">🌀</div><div class="eyebrow">YOU'RE IN</div><h2 id="playerLobbyTitle">Waiting for the host…</h2><p id="playerLobbyInfo" class="muted">3–8 players can play.</p></div>
+      <div id="editorPanel" class="hidden">
+        <div class="phonePrompt"><div><span id="playerSourceEmoji">🧴</span><small id="playerSourceName">Water bottle</small></div><b>→</b><div><span id="playerTargetEmoji">🐶</span><small id="playerTargetName">Dog</small></div></div>
+        <article class="editorCard">
+          <div class="editorHeader"><div><div class="eyebrow">SCULPT THE OBJECT · PRECISION BUILD</div><h2>Grab exactly what you want to move</h2></div></div>
+          <div class="canvasWrap"><canvas id="morphCanvas" width="320" height="320"></canvas></div>
+          <div class="toolRow" role="toolbar" aria-label="Morph tools">
+            <button class="toolButton active" data-tool="warp" type="button"><b>〰</b><span>Warp</span></button>
+            <button class="toolButton" data-tool="rotate" type="button"><b>↻</b><span>Rotate all</span></button>
+            <button class="toolButton" data-tool="stretch" type="button"><b>↔</b><span>Stretch</span></button>
+            <button class="toolButton" data-tool="fisheye" type="button"><b>◉</b><span>Fisheye</span></button>
+          </div>
+          <p id="toolHint" class="muted" style="font-size:.72rem;margin:9px 2px 0">Warp: touch one exact spot and drag it.</p>
+          <button id="submitMorphButton" class="primary huge submitMorph" type="button"><b>SUBMIT MORPH</b><small>You can update it until voting starts</small></button>
+          <div id="submittedNote" class="submittedNote hidden">✓ Submitted — keep sculpting if you want to improve it.</div>
+        </article>
+      </div>
+      <div id="playerVotePanel" class="phoneCard hidden"><div class="eyebrow">HEAD-TO-HEAD VOTE</div><h2 id="playerMatchTitle">Which got closer?</h2><p id="voteInstruction" class="muted">Tap the better transformation.</p><div id="playerMatch" class="phoneMatch"></div><div id="playerVoteProgress" class="voteStatus"></div></div>
+      <div id="playerResultPanel" class="phoneCard waitingCard hidden"><div id="resultEmoji" class="pulseEmoji">🏆</div><div class="eyebrow">ROUND COMPLETE</div><h2 id="playerResultTitle">A morph has won!</h2><p id="playerResultInfo" class="muted">Eyes on the big screen.</p></div>
+    </section>
+    <footer><span>Object² · 3–8 players · 70 randomized transformations</span><span>Precision build 2026.10.09.4 · Twemoji CC-BY 4.0</span></footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="levels.js?v=20261009-precision4"></script>
+  <script src="editor.js?v=20261009-precision4"></script>
+  <script src="script.js?v=20261009-precision4"></script>
+</body>
+</html>
