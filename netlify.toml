@@ -6,6 +6,31 @@
   to = "/Home/index.html"
   status = 200
 
+# Canonicalize the lowercase URL people are actually using.
+[[redirects]]
+  from = "/object2"
+  to = "/Object2/play.html"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/object2/"
+  to = "/Object2/play.html"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/object2/index.html"
+  to = "/Object2/play.html"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/object2/play.html"
+  to = "/Object2/play.html"
+  status = 302
+  force = true
+
 [[redirects]]
   from = "/Object2"
   to = "/Object2/play.html"
